@@ -12,17 +12,32 @@ var buttons = [];
 CreationCenterView = function () {
     View.apply(this, arguments);
 
+    this.viewsInCreationView = [];
+
+    _createLayout.call(this);
     _addTitleSurface.call(this);
     _addSentenceView.call(this);
     _addDescriptionBox.call(this);
+    _addImageDropArea.call(this);
     _addDeleteAndCreateButtons.call(this);
     _addListeners.call(this);
 
     this.buttonsLayout.sequenceFrom(buttons);
+    this.layout.sequenceFrom(this.viewsInCreationView);
+}
 
+function _createLayout() {
+	this.layout = new FlexibleLayout({
+		direction: 1,
+		ratios: [1, 5, 1, 5, 1, 5, 1, 20, 1, 5, 1]
+	});
+
+	this.add(this.layout);
 }
 
 function _addTitleSurface() {
+	var gap = new View();
+
 	this.titleSurface = new Surface({
 		content: '',
 		properties: {
@@ -38,11 +53,15 @@ function _addTitleSurface() {
 		size: [undefined, 100]
 	});
 
-	this.add(this.titleModifier).add(this.titleSurface);
+	//this.add(this.titleModifier).add(this.titleSurface);
+	this.viewsInCreationView.push(gap);
+	this.viewsInCreationView.push(this.titleSurface);
 }
 
 
 function _addSentenceView() {
+	var gap = new View();
+
 	this.sentenceView = new SentenceView();
 
 	this.sentenceViewModifier = new StateModifier({
@@ -52,14 +71,19 @@ function _addSentenceView() {
 		transform: Transform.translate(0, 100, 0)
 	});
 
-	this.add(this.sentenceViewModifier).add(this.sentenceView);
+	//this.add(this.sentenceViewModifier).add(this.sentenceView);
+	this.viewsInCreationView.push(gap);
+	this.viewsInCreationView.push(this.sentenceView);
 }
 
 
 function _addDescriptionBox() {
+	var gap = new View();
+	this.descriptionMainView = new View();
+
 	var descriptionTitleSurface = new Surface({
 		content: 'Task Description',
-		size: [undefined, 15],
+		//size: [undefined, 15],
 		properties: {
 			color: 'white'
 		}
@@ -68,39 +92,59 @@ function _addDescriptionBox() {
 	var descriptionTitleModifier = new StateModifier({
 		align: [0, 0],
 		origin: [0, 0],
-		transform: Transform.translate(0, 180, 0)
+		transform: Transform.translate(0, 0, 0)
 	});
 
-	this.add(descriptionTitleModifier).add(descriptionTitleSurface);
+	this.descriptionMainView.add(descriptionTitleModifier).add(descriptionTitleSurface);
 
 	this.stepDescriptionBoxSurface = new InputSurface({});
 
 	var stepDescriptionBoxModifier = new StateModifier({
 		align: [0.5, 0],
 		origin: [0.5, 0],
-		size: [undefined, 25],
-		transform: Transform.translate(0, 200, 0)
+		//size: [undefined, 25],
+		transform: Transform.translate(0, 20, 0)
 	});
 
-	this.add(stepDescriptionBoxModifier).add(this.stepDescriptionBoxSurface);
+	this.descriptionMainView.add(stepDescriptionBoxModifier).add(this.stepDescriptionBoxSurface);
+	
+	this.viewsInCreationView.push(gap);
+	this.viewsInCreationView.push(this.descriptionMainView);
+}
+
+function _addImageDropArea() {
+	var gap= new View();
+
+	this.dropSurface = new Surface({
+		content: "<div id=\"dropbox\"><span id=\"droplabel\">Drop file here...</span></div><img id=\"preview\" alt=\"[preview will display here]\"/>",
+		properties: {
+			backgroundColor: 'orange'
+		}
+	});
+
+	this.viewsInCreationView.push(gap);
+	this.viewsInCreationView.push(this.dropSurface);
+
 }
 
 
 function _addDeleteAndCreateButtons() {
+	var gap = new View(); 
+
 	this.buttonsLayout = new FlexibleLayout({
 		ratios: [5, 10, 5]
 	});
 
 	this.buttonsLayoutModifier = new StateModifier({
-		align: [0.5, 1],
-		origin: [0.5, 1],
-		size: [undefined, 50]
+		// align: [0.5, 1],
+		// origin: [0.5, 1],
+		//size: [undefined, 50]
 	});
 
-	this.add(this.buttonsLayoutModifier).add(this.buttonsLayout);
+	//this.add(this.buttonsLayoutModifier).add(this.buttonsLayout);
 
 	this.deleteStepSurface = new Surface({
-		size: [undefined, 40],
+		//size: [undefined, 40],
 		content: 'Delete Step',
 		properties: {
 			backgroundColor: '#B6A754',
@@ -117,7 +161,7 @@ function _addDeleteAndCreateButtons() {
 	buttons.push(gapBetweenButtons);
 
 	this.createStepSurface = new Surface({
-		size: [undefined, 40],
+		//size: [undefined, 40],
 		content: 'Create Step',
 		properties: {
 			backgroundColor: '#77BA9B',
@@ -128,6 +172,12 @@ function _addDeleteAndCreateButtons() {
 	});
 
 	buttons.push(this.createStepSurface);
+
+	this.viewsInCreationView.push(gap);
+	this.viewsInCreationView.push(this.buttonsLayout);
+
+	var gap = new View();
+	this.viewsInCreationView.push(gap);
 
 	this.createStepSurface.on('click', function() {
 		this._eventOutput.emit('createAndAddStepToTutorial');
