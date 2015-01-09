@@ -20,6 +20,8 @@ CreationCenterView = function () {
     _addDescriptionBox.call(this);
     _addImageDropArea.call(this);
     _addDeleteAndCreateButtons.call(this);
+
+    _imageDropAreaListeners.call(this);
     _addListeners.call(this);
 
     this.buttonsLayout.sequenceFrom(buttons);
@@ -116,7 +118,7 @@ function _addImageDropArea() {
 	var gap= new View();
 
 	this.dropSurface = new Surface({
-		content: "<div id=\"dropbox\"><span id=\"droplabel\">Drop file here...</span></div><img id=\"preview\" alt=\"[preview will display here]\"/>",
+		content: "<div id=\"dropbox\"><span id=\"droplabel\">Drop file here...</span></div><img id=\"preview\" alt=\"[preview will display here]\" class=\"dropArea\" />",
 		properties: {
 			backgroundColor: 'orange'
 		}
@@ -124,8 +126,63 @@ function _addImageDropArea() {
 
 	this.viewsInCreationView.push(gap);
 	this.viewsInCreationView.push(this.dropSurface);
+}
+
+function _imageDropAreaListeners() {
+	var dropbox = this.dropSurface;
+
+	dropbox.on("dragenter", function(evt) {
+		noopHandler(evt);
+	}.bind(this));
+
+	dropbox.on("dragexit", function(evt) {
+		noopHandler(evt);
+	}.bind(this));
+
+	dropbox.on("dragover", function(evt) {
+		noopHandler(evt);
+	}.bind(this));
+
+	dropbox.on("drop", function(evt) {
+		drop(evt);
+	}.bind(this));
 
 }
+
+function noopHandler(evt) {
+	evt.stopPropagation();
+	evt.preventDefault();
+}
+
+function drop(evt) {
+	evt.stopPropagation();
+	evt.preventDefault();
+
+	var files = evt.dataTransfer.files;
+	var count = files.length;
+
+	if (count > 0) {
+		handleFiles(files);
+	}
+}
+
+function handleFiles(files) {
+	var file = files[0];
+
+	document.getElementById("droplabel").innerHTML = "Processing...";
+
+	var reader = new FileReader();
+
+	reader.onload = handleReaderLoad;
+
+	reader.readAsDataURL(file);
+}
+
+function handleReaderLoad(evt) {
+	var img = document.getElementById("preview");
+	img.src = evt.target.result;
+}
+
 
 
 function _addDeleteAndCreateButtons() {
