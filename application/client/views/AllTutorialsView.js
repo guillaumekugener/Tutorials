@@ -12,6 +12,7 @@ AllTutorialsView = function () {
 
     _createBackground.call(this);
     _addScrollview.call(this);
+    _addTutorialOverviewView.call(this);
 
     this.tutorialsScrollview.sequenceFrom(tutorialsToAdd);
 
@@ -44,10 +45,23 @@ function _addScrollview() {
 	this.tutorialsScrollview = new Scrollview();
 
 	this.tutorialsScrollviewModifier = new StateModifier({
+		size: [this.options.widthOfListedTutorials, undefined],
+		origin: [0, 0],
+		align: [0, 0],
 		transform: Transform.translate(0, 0, 1)
 	});
 
 	this.add(this.tutorialsScrollviewModifier).add(this.tutorialsScrollview);
+}
+
+function _addTutorialOverviewView () {
+	this.tutorialOverviewView = new TutorialOverviewView();
+
+	this.tutorialOverviewModifier = new StateModifier({
+		size: [undefined, undefined]
+	});
+
+	this.add(this.tutorialOverviewModifier).add(this.tutorialOverviewView);
 }
 
 function _addListeners() {
@@ -59,12 +73,14 @@ AllTutorialsView.prototype.constructor = AllTutorialsView;
 
 AllTutorialsView.prototype.addItemToList = function(self, doc) {
 	var itemSurface = new Surface({
-		size: [undefined, 40],
-		content: doc.name,
+		size: [undefined, 100],
+		content: doc.name + '<br>' + '<span>The tutorial\'s description</span>',
 		properties: {
-			backgroundColor: '#639BF1'
+
 		}
 	});
+
+	itemSurface.addClass('allTutorialsItem');
 
 	itemSurface.selected = false;
 	// itemSurface.index = tutorialsToAdd.length;
@@ -127,4 +143,6 @@ AllTutorialsView.prototype.getSelectedSurface = function() {
 	return this.selectedSurface;
 }
 
-AllTutorialsView.DEFAULT_OPTIONS = {};
+AllTutorialsView.DEFAULT_OPTIONS = {
+	widthOfListedTutorials: 300
+};
