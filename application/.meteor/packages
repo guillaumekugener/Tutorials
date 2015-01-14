@@ -8,3 +8,5 @@ meteor-platform
 autopublish
 insecure
 raix:famono
+sanjo:jasmine
+velocity:html-reporter
