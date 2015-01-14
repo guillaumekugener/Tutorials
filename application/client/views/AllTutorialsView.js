@@ -14,6 +14,8 @@ AllTutorialsView = function () {
     _addScrollview.call(this);
     _addTutorialOverviewView.call(this);
 
+    _addListeners.call(this);
+
     this.tutorialsScrollview.sequenceFrom(tutorialsToAdd);
 
     nounsCursorToArray(
@@ -65,7 +67,9 @@ function _addTutorialOverviewView () {
 }
 
 function _addListeners() {
-
+	this.tutorialOverviewView.on('continueToStepsView', function() {
+		this._eventOutput.emit('tutorialWasSelectedOrUnselected');
+	}.bind(this));
 }
 
 AllTutorialsView.prototype = Object.create(View.prototype);
@@ -83,34 +87,26 @@ AllTutorialsView.prototype.addItemToList = function(self, doc) {
 	itemSurface.addClass('allTutorialsItem');
 
 	itemSurface.selected = false;
-	// itemSurface.index = tutorialsToAdd.length;
 
-	// itemSurface.on('click', function() {
-	// 	if (self.selected === undefined) {
-	// 		self.selected = itemSurface.getContent();
-	// 		self.selectedSurface = itemSurface;
-	// 		itemSurface.selected = true;
-	// 		itemSurface.setProperties({'backgroundColor':'#3B5998'});
-	// 	}
-	// 	else {
-	// 		if (itemSurface.selected) {
-	// 			itemSurface.setProperties({'backgroundColor':'#639BF1'});
-	// 			itemSurface.selected = false;
-	// 			self.selected = undefined;
-	// 		}
-	// 		else {
-	// 			itemSurface.setProperties({'backgroundColor':'#639BF1'});
-	// 		}
-	// 	}
-	// 	self._eventOutput.emit('tutorialWasSelectedOrUnselected');
-
-
-	// }.bind(this));
-
+	//When a Tutorial is clicked on, the information displayed in the tutorial overview
+	//screen changes to match the information in the tutorial
 	itemSurface.on('click', function() {
-		self.selected = itemSurface.getContent();
+		self.selected = itemSurface.getContent().split("<br>")[0];
+		var tutorialName = self.selected;
+
+		Meteor.call('getTutorialHomeScreenInfo', tutorialName, function(error, result) {
+			
+			self.tutorialOverviewView.setTitleInformation({
+				title: result.name,
+				numberOfSteps: result.steps.length
+			});
+
+			console.log(result);
+		});
+
 		itemSurface.selected = true;
-		self._eventOutput.emit('tutorialWasSelectedOrUnselected');
+		this.tutorialOverviewView.setTitleInformation('Awesome title', '13', 'Yo yo and yo mama', 'blah blah nothing');
+		// self._eventOutput.emit('tutorialWasSelectedOrUnselected');
 		itemSurface.setProperties({'opacity': 1});
 	}.bind(this));
 

@@ -150,17 +150,52 @@ function _createBody() {
 
 	this.layout.content.add(this.mainSequentialLayoutInBody);
 
+	//Add the continue to full tutorial button
+	this.viewFullTutorialButtonSurface = new Surface({
+		content: "View complete tutorial",
+		size: [300, 60]
+	});
+
+	this.viewFullTutorialButtonSurface.addClass("continuePositiveButtonSurface");
+
+	var viewFullTutorialButtonModifier = new StateModifier({
+		align: [1, 0.5],
+		origin: [1, 0.5],
+		transform: Transform.translate(-20, 0, 0)
+	});
+
+	this.layout.footer.add(viewFullTutorialButtonModifier).add(this.viewFullTutorialButtonSurface);
+
 }
 
 function _addListeners() {
+
+	//In order to correctly resize the view in the overview area
 	window.onresize = function(evt) {
 		this.flexBodyLayoutModifier.setSize([window.innerWidth-300, undefined]);
 	}.bind(this);
+
+	//Add the continue to complete tutorial listener. Listener that causes user to go from
+	//tutorial overview screen to the tutorial steps screen
+	this.viewFullTutorialButtonSurface.on('click', function() {
+		this._eventOutput.emit('continueToStepsView');
+	}.bind(this));
 }
 
 
 TutorialOverviewView.prototype = Object.create(View.prototype);
 TutorialOverviewView.prototype.constructor = TutorialOverviewView;
+
+TutorialOverviewView.prototype.setTitleInformation = function(doc) {
+	console.log(doc);
+	var parsedAuthors = "John Doe, James Other";
+	var newContent = '<div>'+doc.title+'</div><br><span id="authors">authors: '+parsedAuthors+'</span>';
+
+	this.tutorialTitleSurface.setContent(newContent);
+
+	this.tutorialStepsSurface.setContent('<div>'+doc.numberOfSteps+' Steps</div>');
+}
+
 
 TutorialOverviewView.DEFAULT_OPTIONS = {
 	headerSize: 150,
