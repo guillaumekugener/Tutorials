@@ -91,23 +91,21 @@ AllTutorialsView.prototype.addItemToList = function(self, doc) {
 	//When a Tutorial is clicked on, the information displayed in the tutorial overview
 	//screen changes to match the information in the tutorial
 	itemSurface.on('click', function() {
-		self.selected = itemSurface.getContent().split("<br>")[0];
-		var tutorialName = self.selected;
+		var tutorialName = itemSurface.getContent().split("<br>")[0];
 
-		Meteor.call('getTutorialHomeScreenInfo', tutorialName, function(error, result) {
-			
-			self.tutorialOverviewView.setTitleInformation({
-				title: result.name,
-				numberOfSteps: result.steps.length
+		if (self.selected !== tutorialName) {
+			self.selected = tutorialName;
+
+			Meteor.call('getTutorialHomeScreenInfo', tutorialName, function(error, result) {
+				self.tutorialOverviewView.setTitleInformation({
+					title: result.name,
+					numberOfSteps: result.steps.length
+				});
 			});
 
-			console.log(result);
-		});
-
-		itemSurface.selected = true;
-		this.tutorialOverviewView.setTitleInformation('Awesome title', '13', 'Yo yo and yo mama', 'blah blah nothing');
-		// self._eventOutput.emit('tutorialWasSelectedOrUnselected');
-		itemSurface.setProperties({'opacity': 1});
+			itemSurface.selected = true;
+			itemSurface.setProperties({'opacity': 1});
+		}
 	}.bind(this));
 
 

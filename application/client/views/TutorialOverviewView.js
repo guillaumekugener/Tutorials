@@ -187,7 +187,6 @@ TutorialOverviewView.prototype = Object.create(View.prototype);
 TutorialOverviewView.prototype.constructor = TutorialOverviewView;
 
 TutorialOverviewView.prototype.setTitleInformation = function(doc) {
-	console.log(doc);
 	var parsedAuthors = "John Doe, James Other";
 	var newContent = '<div>'+doc.title+'</div><br><span id="authors">authors: '+parsedAuthors+'</span>';
 
