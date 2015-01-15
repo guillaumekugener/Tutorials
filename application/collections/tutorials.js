@@ -21,5 +21,8 @@ Meteor.methods({
 	getTutorialSteps: function(tutorialName) {
 		var tutorial = Tutorials.findOne({name: tutorialName});
 		return tutorial.steps;
+	},
+	getTutorialHomeScreenInfo: function(tutorialName) {
+		return Tutorials.findOne({name: tutorialName});
 	}
 });

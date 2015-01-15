@@ -12,6 +12,9 @@ AllTutorialsView = function () {
 
     _createBackground.call(this);
     _addScrollview.call(this);
+    _addTutorialOverviewView.call(this);
+
+    _addListeners.call(this);
 
     this.tutorialsScrollview.sequenceFrom(tutorialsToAdd);
 
@@ -44,14 +47,29 @@ function _addScrollview() {
 	this.tutorialsScrollview = new Scrollview();
 
 	this.tutorialsScrollviewModifier = new StateModifier({
+		size: [this.options.widthOfListedTutorials, undefined],
+		origin: [0, 0],
+		align: [0, 0],
 		transform: Transform.translate(0, 0, 1)
 	});
 
 	this.add(this.tutorialsScrollviewModifier).add(this.tutorialsScrollview);
 }
 
-function _addListeners() {
+function _addTutorialOverviewView () {
+	this.tutorialOverviewView = new TutorialOverviewView();
 
+	this.tutorialOverviewModifier = new StateModifier({
+		size: [undefined, undefined]
+	});
+
+	this.add(this.tutorialOverviewModifier).add(this.tutorialOverviewView);
+}
+
+function _addListeners() {
+	this.tutorialOverviewView.on('continueToStepsView', function() {
+		this._eventOutput.emit('tutorialWasSelectedOrUnselected');
+	}.bind(this));
 }
 
 AllTutorialsView.prototype = Object.create(View.prototype);
@@ -59,43 +77,35 @@ AllTutorialsView.prototype.constructor = AllTutorialsView;
 
 AllTutorialsView.prototype.addItemToList = function(self, doc) {
 	var itemSurface = new Surface({
-		size: [undefined, 40],
-		content: doc.name,
+		size: [undefined, 100],
+		content: doc.name + '<br>' + '<span>The tutorial\'s description</span>',
 		properties: {
-			backgroundColor: '#639BF1'
+
 		}
 	});
 
+	itemSurface.addClass('allTutorialsItem');
+
 	itemSurface.selected = false;
-	// itemSurface.index = tutorialsToAdd.length;
 
-	// itemSurface.on('click', function() {
-	// 	if (self.selected === undefined) {
-	// 		self.selected = itemSurface.getContent();
-	// 		self.selectedSurface = itemSurface;
-	// 		itemSurface.selected = true;
-	// 		itemSurface.setProperties({'backgroundColor':'#3B5998'});
-	// 	}
-	// 	else {
-	// 		if (itemSurface.selected) {
-	// 			itemSurface.setProperties({'backgroundColor':'#639BF1'});
-	// 			itemSurface.selected = false;
-	// 			self.selected = undefined;
-	// 		}
-	// 		else {
-	// 			itemSurface.setProperties({'backgroundColor':'#639BF1'});
-	// 		}
-	// 	}
-	// 	self._eventOutput.emit('tutorialWasSelectedOrUnselected');
-
-
-	// }.bind(this));
-
+	//When a Tutorial is clicked on, the information displayed in the tutorial overview
+	//screen changes to match the information in the tutorial
 	itemSurface.on('click', function() {
-		self.selected = itemSurface.getContent();
-		itemSurface.selected = true;
-		self._eventOutput.emit('tutorialWasSelectedOrUnselected');
-		itemSurface.setProperties({'opacity': 1});
+		var tutorialName = itemSurface.getContent().split("<br>")[0];
+
+		if (self.selected !== tutorialName) {
+			self.selected = tutorialName;
+
+			Meteor.call('getTutorialHomeScreenInfo', tutorialName, function(error, result) {
+				self.tutorialOverviewView.setTitleInformation({
+					title: result.name,
+					numberOfSteps: result.steps.length
+				});
+			});
+
+			itemSurface.selected = true;
+			itemSurface.setProperties({'opacity': 1});
+		}
 	}.bind(this));
 
 
@@ -127,4 +137,6 @@ AllTutorialsView.prototype.getSelectedSurface = function() {
 	return this.selectedSurface;
 }
 
-AllTutorialsView.DEFAULT_OPTIONS = {};
+AllTutorialsView.DEFAULT_OPTIONS = {
+	widthOfListedTutorials: 300
+};
