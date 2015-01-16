@@ -23,6 +23,10 @@ Meteor.methods({
 			throw new Meteor.Error("A new tutorial needs a name!");
 		}
 
+		if (Tutorials.findOne({name: doc.name}) !== undefined) {
+			throw new Meteor.Error("A tutorial with this name already exisits");
+		}
+
 		return Tutorials.insert(doc);
 	},
 	addOrModifyStep: function(doc) {

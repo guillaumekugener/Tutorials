@@ -15,14 +15,12 @@ AddItemsInTutorialView = function () {
     View.apply(this, arguments);
 
     this.bodyFlexibleLayoutViews = [];
-    this.usersListedItems = [];
     this.allListedItems = [];
 
     _createLayouts.call(this);
     _createBodyViews.call(this);
 
     this.bodyFlexibleLayout.sequenceFrom(this.bodyFlexibleLayoutViews);
-    this.usersItemsScrollview.sequenceFrom(this.usersListedItems);
     this.allItemsScrollview.sequenceFrom(this.allListedItems);
 }
 
@@ -45,7 +43,7 @@ function _createBodyViews() {
 	var leftHandGap = new View();
 	this.bodyFlexibleLayoutViews.push(leftHandGap);
 
-	this.usersItemsScrollview = new Scrollview();
+	this.usersItemsScrollview = new SearchableItemsListView();
 	this.bodyFlexibleLayoutViews.push(this.usersItemsScrollview);
 
 	var middleGap = new View();

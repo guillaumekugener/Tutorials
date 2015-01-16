@@ -12,14 +12,19 @@ SearchBarView = function () {
 }
 
 function _createSearchSurfaces() {
-	var searchBarSurface = new InputSurface({
+	this.searchBarSurface = new InputSurface({
 		size: [undefined, 25]
 	});
 
-	this.add(searchBarSurface);
+	this.add(this.searchBarSurface);
 }
 
 SearchBarView.prototype = Object.create(View.prototype);
 SearchBarView.prototype.constructor = SearchBarView;
+
+SearchBarView.prototype.setSize = function(size) {
+	this.searchBarSurface.setSize(size);
+}
+
 
 SearchBarView.DEFAULT_OPTIONS = {};
