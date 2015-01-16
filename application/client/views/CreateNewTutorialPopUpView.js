@@ -41,8 +41,26 @@ function _createFormLayout() {
 CreateNewTutorialPopUpView.prototype = Object.create(View.prototype);
 CreateNewTutorialPopUpView.prototype.constructor = CreateNewTutorialPopUpView;
 
+/*
+* This function is called when the finished button is clicked on the pop up.
+* This function returns true or false, based on the validity of the input
+* then the function returns false
+*/
 CreateNewTutorialPopUpView.prototype.finishedFunction = function(self) {
 	var tutorialName = self.newTutorialNameSurface.getValue();
 
-	Meteor.call('newTutorial', {name: tutorialName, steps: []}, function(error, result) {});
+	if (tutorialName === undefined || tutorialName === '') {
+		return false;
+	}
+
+	var docToInsert = {
+		name: tutorialName,
+		authors: {},
+		description: '',
+		steps: []
+	}
+
+	Meteor.call('newTutorial', docToInsert, function(error, result) {});
+
+	return true;
 }

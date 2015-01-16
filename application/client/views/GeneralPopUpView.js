@@ -129,10 +129,19 @@ function _createForm() {
 		self._eventOutput.emit('hideForm');
 	}.bind(this));
 
+	/*
+	* Listener that calls the finishedFunction from the user made view. 
+	* That function returns tre/false depending on what has happened in the pop up,
+	* which allows for the user to determine whether they want the pop up closed or not
+	*/
 	finishFormButtonSurface.on('click', function() {
-		this.userMadeFormView.finishedFunction(this.userMadeFormView);
-		self._eventOutput.emit('finishedForm');
-		self._eventOutput.emit('hideForm');
+		var finishForm = this.userMadeFormView.finishedFunction(this.userMadeFormView);
+
+		if (finishForm) {
+			self._eventOutput.emit('finishedForm');
+			self._eventOutput.emit('hideForm');
+		}
+
 	}.bind(this));
 
 	this.upDownFlexibleLayoutViews.push(buttonViews);

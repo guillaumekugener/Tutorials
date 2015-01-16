@@ -474,7 +474,6 @@ function _addListeners() {
 */
 function _createNewTutorialPopUp() {
 	var inputViewForPopUp = new CreateNewTutorialPopUpView();
-	console.log('hello');
 	this.createNewTutorialPopUpView = new GeneralPopUpView(inputViewForPopUp);
 
 	this.createNewTutorialPopUpViewModifier = new StateModifier({

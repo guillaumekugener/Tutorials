@@ -11,4 +11,6 @@ Package.on_use(function (api) {
 	api.add_files("tests/jasmine/client/integration/sample/spec/SpecMatchers.js",["client"]);
 	api.add_files("tests/jasmine/client/integration/sample/src/Player.js",["client"]);
 	api.add_files("tests/jasmine/client/integration/sample/src/Song.js",["client"]);
+	api.add_files("tests/jasmine/client/integration/TutorialSelectionAndCreationTests.js",["client"]);
+	api.add_files("tests/jasmine/server/integration/TutorialSelectionAndCreationTests.js",["server"]);
 });
