@@ -49,9 +49,10 @@ CreateNewTutorialPopUpView.prototype.constructor = CreateNewTutorialPopUpView;
 CreateNewTutorialPopUpView.prototype.finishedFunction = function(self) {
 	var tutorialName = self.newTutorialNameSurface.getValue();
 
-	if (tutorialName === undefined || tutorialName === '') {
-		return false;
-	}
+
+	// if (tutorialName === undefined || tutorialName === '') {
+
+	// }
 
 	var docToInsert = {
 		name: tutorialName,
@@ -60,7 +61,13 @@ CreateNewTutorialPopUpView.prototype.finishedFunction = function(self) {
 		steps: []
 	}
 
-	Meteor.call('newTutorial', docToInsert, function(error, result) {});
+	Meteor.call('newTutorial', docToInsert, function(error, result) {
+		if (error) {
 
-	return true;
+		}
+		else {
+			self._eventOutput.emit('validValuesEntered');
+		}
+	});
+
 }

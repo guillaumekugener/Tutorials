@@ -16,6 +16,7 @@ GeneralPopUpView = function (popUpCustomFormView) {
 
     _addBackground.call(this);
     _createForm.call(this);
+    _addListeners.call(this);
 
     this.upDownFlexibleLayout.sequenceFrom(this.upDownFlexibleLayoutViews);
 }
@@ -131,17 +132,12 @@ function _createForm() {
 
 	/*
 	* Listener that calls the finishedFunction from the user made view. 
-	* That function returns tre/false depending on what has happened in the pop up,
-	* which allows for the user to determine whether they want the pop up closed or not
+	* This funciton will execute some code and when that is done, it will output 'validValuesEntered'
+	* (if the values that the user entered are valid) which will then trigger a listener on the
+	* pop up view
 	*/
 	finishFormButtonSurface.on('click', function() {
-		var finishForm = this.userMadeFormView.finishedFunction(this.userMadeFormView);
-
-		if (finishForm) {
-			self._eventOutput.emit('finishedForm');
-			self._eventOutput.emit('hideForm');
-		}
-
+		this.userMadeFormView.finishedFunction(this.userMadeFormView);
 	}.bind(this));
 
 	this.upDownFlexibleLayoutViews.push(buttonViews);
@@ -149,6 +145,13 @@ function _createForm() {
 	this.genericFormView.add(this.upDownFlexibleLayoutModifier).add(this.upDownFlexibleLayout);
 
 	this.add(this.genericFormModifier).add(this.genericFormView);
+}
+
+function _addListeners() {
+	this.userMadeFormView.on('validValuesEntered', function() {
+		this._eventOutput.emit('finishedForm');
+		this._eventOutput.emit('hideForm');
+	}.bind(this));
 }
 
 GeneralPopUpView.prototype = Object.create(View.prototype);
