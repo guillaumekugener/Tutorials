@@ -30,6 +30,7 @@ TutorialAppHomeView = function () {
     _createNewTutorialPopUp.call(this);
     _createStepsListView.call(this);
     _createTutorialSelectedHeader.call(this);
+    _createAddItemsInTutorialView.call(this);
 
 
     _addListeners.call(this);
@@ -122,19 +123,6 @@ function _createHeader() {
 		origin: [0.5, 0]
 	});
 
-	//Event handler for when the menu icon is clicked, right now simply moving views around
-	// mainMenuIcon.on('click', function() {
-	// 	if (this.centered) {
-	// 		this.slideMainViewToRight();			
-	// 	}
-	// 	else {
-	// 		this.slideMainViewBackToCenter();
-	// 	}
-
-	// 	this.centered = !this.centered;
-
-	// }.bind(this));
-
 	iconView.add(mainMenuIconModifier).add(mainMenuIcon);
 	headerViews.push(iconView);
 
@@ -146,11 +134,6 @@ function _createHeader() {
 	headerViews.push(this.headerSearchBarView);
 
 	var addIconView = new View();
-
-	// var addIconSurface = new ImageSurface({
-	// 	size: [25, 25],
-	// 	content: 'img/plus.png'
-	// });
 
 	var addIconSurface = new Surface({
 		size: [undefined, 30],
@@ -171,8 +154,6 @@ function _createHeader() {
 
 	addIconSurface.on('click', function() {
 		if (this.onHomeScreen) {
-			// this.showStepCreationView();
-			// this.onHomeScreen = !this.onHomeScreen;
 			this.showCreateNewTutorialPopUp();
 		}
 	}.bind(this));
@@ -369,8 +350,6 @@ function _createBodyView() {
 		transform: Transform.translate(0, 0, 0)
 	});
 
-	//this.layout.content.add(this.alltutorialsScrollviewModifier).add(this.alltutorialsScrollView);
-	//this.layout.content.add(this.stepCreationModifier).add(this.stepCreationView);
 	this.lightbox.show(this.alltutorialsScrollView);
 }
 
@@ -397,6 +376,7 @@ function _addListeners() {
 		var tutorialName = this.alltutorialsScrollView.selected;
 		this.stepCreationView.setTutorialTitle(tutorialName);
 		this.changeToSelectedTutorialNavBar(tutorialName);
+		this.slideMenuUpIntoView();
 		this.matchStepsInScrollviewToTutorial(tutorialName, this.stepsListView);
 		this.showBlankScreen();
 		this.slideMainViewToRight();
@@ -409,14 +389,18 @@ function _addListeners() {
 		this.createNewTutorialPopUpViewModifier.setVisible(false);
 	}.bind(this));
 
-	//Same as above but for a finished tutorial
+	//A new tutorial was created and named. Show the step 0 view to allow users to add items to their 
+	//newly created tutorial
 	this.createNewTutorialPopUpView.on('finishedForm', function() {
 		var tutorialName = this.alltutorialsScrollView.selected;
 		this.stepCreationView.setTutorialTitle(tutorialName);
 		this.changeToSelectedTutorialNavBar(tutorialName);
-		this.showBlankScreen();
-		this.slideMainViewToRight();
+		//this.showBlankScreen();
+		//this.slideMainViewToRight();
 		this.stepCreationView.setTutorialTitle(tutorialName);
+
+		this.hideMenuDownBelowScreen();
+		this.showStepZeroScreen();
 	}.bind(this));
 
 	//When the user wants to return to see all the tutorials (the landing page)
@@ -504,6 +488,16 @@ function _createStepsListView() {
 	this.add(this.stepsListModifier).add(this.stepsListView);
 }
 
+/*
+* Create the step 0 view, that displays when the user wants to create a new tutorial. This view
+* appears once the user has given their tutorial a name
+*/
+function _createAddItemsInTutorialView() {
+	this.step0View = new AddItemsInTutorialView();
+
+
+}
+
 
 TutorialAppHomeView.prototype = Object.create(View.prototype);
 TutorialAppHomeView.prototype.constructor = TutorialAppHomeView;
@@ -517,7 +511,6 @@ TutorialAppHomeView.prototype.constructor = TutorialAppHomeView;
 TutorialAppHomeView.prototype.changeToSelectedTutorialNavBar = function(tutorialName) {
 	this.selectedTutorialNavBarTitleSurface.setContent(tutorialName);
 	this.navbarLightBox.show(this.tutorialSelectedHeaderView);
-	this.slideMenuUpIntoView();
 }
 
 /*
@@ -612,6 +605,13 @@ TutorialAppHomeView.prototype.hideMenuDownBelowScreen = function() {
 		duration: 300,
 		curve: 'easeOut'
 	});
+}
+
+/*
+* Show the step 0 screen where we add items to a newly created tutorial
+*/
+TutorialAppHomeView.prototype.showStepZeroScreen = function() {
+	this.lightbox.show(this.step0View);
 }
 
 

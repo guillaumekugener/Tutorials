@@ -13,5 +13,11 @@ Meteor.methods({
 		var itemInformation = Nouns.findOne({name: itemName});
 
 		return itemInformation;
+	},
+	getAllMatchingItems: function(criteria) {
+		var search = new RegExp(criteria, 'i');
+
+		var found = Nouns.find({name: search}).fetch();
+		return found;
 	}
 });

@@ -20,11 +20,11 @@ Meteor.methods({
 		check(doc.name, String);
 
 		if (doc.name === '' || doc.name === undefined) {
-			throw new Meteor.Error("A new tutorial needs a name!");
+			throw new Meteor.Error("no-name", "A new tutorial needs a name!");
 		}
 
 		if (Tutorials.findOne({name: doc.name}) !== undefined) {
-			throw new Meteor.Error("A tutorial with this name already exisits");
+			throw new Meteor.Error("tutorial-name-used", "A tutorial with the name \"" + doc.name + "\" already exists");
 		}
 
 		return Tutorials.insert(doc);

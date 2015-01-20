@@ -24,6 +24,12 @@ AddItemsInTutorialView = function () {
     this.allItemsScrollview.sequenceFrom(this.allListedItems);
 }
 
+/* Create the layouts that will be used to place the views
+*
+* In this case, a FlexibleLayout is placed inside a HeaderFooterLayout. The HeaderFooterLayout
+* allows us to easily add padding on the top and the bottom of the view, while the flexible layout
+* allows us to evenly space out the contents in the view.
+*/
 function _createLayouts() {
 	this.mainOuterHeaderFooterLayout = new HeaderFooterLayout({
 		headerSize: this.options.headerSize,
@@ -39,6 +45,10 @@ function _createLayouts() {
 	this.add(this.mainOuterHeaderFooterLayout);
 }
 
+/* Add the views to the flexible layout. This includes three gaps, a searchable scrollview and
+* a normal scrollview. The searchable scrollview will display all of the items in the database, while the
+* normal scrollview will show all of the items that have been added to this tutorial so far
+*/ 
 function _createBodyViews() {
 	var leftHandGap = new View();
 	this.bodyFlexibleLayoutViews.push(leftHandGap);

@@ -9,6 +9,7 @@ SearchBarView = function () {
     View.apply(this, arguments);
 
     _createSearchSurfaces.call(this);
+    _addListeners.call(this);
 }
 
 function _createSearchSurfaces() {
@@ -19,11 +20,26 @@ function _createSearchSurfaces() {
 	this.add(this.searchBarSurface);
 }
 
+/*
+* Add listeners to the input surface, specifically, onkeyup, and then fire an event that notifies
+* views with the SearchBarView that the user has entered data
+*/
+function _addListeners() {
+	//For some reason the listener is called keyup instead of onkeyup...
+	this.searchBarSurface.on('keyup', function() {
+		this._eventOutput.emit('userSearched');
+	}.bind(this));
+}
+
 SearchBarView.prototype = Object.create(View.prototype);
 SearchBarView.prototype.constructor = SearchBarView;
 
 SearchBarView.prototype.setSize = function(size) {
 	this.searchBarSurface.setSize(size);
+}
+
+SearchBarView.prototype.getContent = function() {
+	return this.searchBarSurface.getValue();
 }
 
 
