@@ -87,11 +87,12 @@ AllTutorialsView.prototype.addItemToList = function(self, doc) {
 	itemSurface.addClass('allTutorialsItem');
 
 	itemSurface.selected = false;
+	itemSurface.name = doc.name;
 
 	//When a Tutorial is clicked on, the information displayed in the tutorial overview
 	//screen changes to match the information in the tutorial
 	itemSurface.on('click', function() {
-		var tutorialName = itemSurface.getContent().split("<br>")[0];
+		var tutorialName = itemSurface.name;
 
 		if (self.selected !== tutorialName) {
 			self.selected = tutorialName;

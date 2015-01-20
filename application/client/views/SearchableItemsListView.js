@@ -96,6 +96,7 @@ SearchableItemsListView.prototype.constructor = SearchableItemsListView;
 SearchableItemsListView.prototype.getItemsMatchingSearch = function() {
 	var self = this;
 	var criteria = this.searchBarView.getContent();
+	this.clearListOfElements();
 	Meteor.call('getAllMatchingItems', criteria, function(error, result) {
 		for (var i = 0; i< result.length; i++) {
 			self.addItemToFilteredList(result[i].name);
@@ -104,7 +105,6 @@ SearchableItemsListView.prototype.getItemsMatchingSearch = function() {
 }
 
 SearchableItemsListView.prototype.addItemToFilteredList = function(itemName) {
-	console.log(itemName);
 	var itemSurface = new Surface({
 		content: itemName,
 		size: [undefined, 50],
@@ -117,6 +117,11 @@ SearchableItemsListView.prototype.addItemToFilteredList = function(itemName) {
 
 	this.filteredItems.push(itemSurface);
 	itemSurface.pipe(this.filteredItemsScrollview);
+}
+
+SearchableItemsListView.prototype.clearListOfElements = function() {
+	this.filteredItems = [];
+	this.filteredItemsScrollview.sequenceFrom(this.filteredItems);
 }
 
 SearchableItemsListView.DEFAULT_OPTIONS = {
