@@ -14,6 +14,8 @@ SearchableItemsListView = function () {
 
     this.filteredItems = [];
 
+    this.selected = undefined;
+
     _createTopOfList.call(this);
     _createScrollviewOfList.call(this);
     _addListener.call(this);
@@ -104,6 +106,7 @@ SearchableItemsListView.prototype.getItemsMatchingSearch = function() {
 	});
 }
 
+//Add an item to the SearchableListView
 SearchableItemsListView.prototype.addItemToFilteredList = function(itemName) {
 	var itemSurface = new Surface({
 		content: itemName,
@@ -115,13 +118,29 @@ SearchableItemsListView.prototype.addItemToFilteredList = function(itemName) {
 		}
 	});
 
+	itemSurface.name = itemName;
+
 	this.filteredItems.push(itemSurface);
 	itemSurface.pipe(this.filteredItemsScrollview);
+
+	//Add an action listener on a surface for when a user wants to add it to their list
+	itemSurface.on('dblclick', function() {
+		console.log('dblclicked');
+		this.selected = itemSurface;
+		this._eventOutput.emit('userWantsToAddItem');
+	}.bind(this));
 }
 
+//Clear the entire list view when an item is being 
 SearchableItemsListView.prototype.clearListOfElements = function() {
 	this.filteredItems = [];
 	this.filteredItemsScrollview.sequenceFrom(this.filteredItems);
+}
+
+SearchableItemsListView.prototype.getAndReturnSelected = function() {
+	var selected = this.selected;
+	this.selected = undefined;
+	return selected;
 }
 
 SearchableItemsListView.DEFAULT_OPTIONS = {

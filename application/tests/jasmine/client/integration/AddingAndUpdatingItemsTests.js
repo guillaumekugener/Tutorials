@@ -28,4 +28,24 @@ describe("create a new item and add it to the database", function() {
 		expect(Meteor.Errors).toHaveBeenCalled();
 		expect(Nouns.insert).not.toHaveBeenCalled();
 	});
+
+	it("the search for items should find all the items that match the regex and exluce others", function() {
+		// var newItems = [
+		// 	{name: 'animal'},
+		// 	{name: 'bird'},
+		// 	{name: 'bear'},
+		// 	{name: 'lion'},
+		// 	{name: 'octopus'}
+		// ];
+
+		// for (var i=0; i < newItems.length; i++) {
+		// 	Nouns.insert(newItems[i]);
+		// }
+
+		// //Now run the search funciton and make sure it returns the expected results. Need to figure out how to do
+		// //this while getting around the fact that Meteor.call is asynchronous
+		// Meteor.call('getAllMatchingItems', 'a', function(error, result) {} );
+		
+		
+	});
 });

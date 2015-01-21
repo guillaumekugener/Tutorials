@@ -449,6 +449,13 @@ function _addListeners() {
 			self.stepsListView.addItemToList(self.stepsListView, newestStep, lengthTotal-1);
 		});
 	}.bind(this));
+
+	//This event fires after the user has added their inital items to a newly created tutorial
+	this.step0View.on('continueToStepCreationFromStep0', function() {
+		this.showBlankScreen();
+		this.slideMainViewToRight();
+		this.slideMenuUpIntoView();
+	}.bind(this));
 }
 
 /*

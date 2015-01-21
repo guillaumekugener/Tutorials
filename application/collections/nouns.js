@@ -14,6 +14,7 @@ Meteor.methods({
 
 		return itemInformation;
 	},
+	//Return all of the items in the collection that match the regex expression
 	getAllMatchingItems: function(criteria) {
 		var search = new RegExp(criteria, 'i');
 
