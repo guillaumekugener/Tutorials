@@ -392,7 +392,9 @@ function _addListeners() {
 	//A new tutorial was created and named. Show the step 0 view to allow users to add items to their 
 	//newly created tutorial
 	this.createNewTutorialPopUpView.on('finishedForm', function() {
-		var tutorialName = this.alltutorialsScrollView.selected;
+		var formInfo = this.createNewTutorialPopUpView.getFieldInfo();
+		var tutorialName = formInfo.name;
+		console.log(tutorialName);
 		this.stepCreationView.setTutorialTitle(tutorialName);
 		this.changeToSelectedTutorialNavBar(tutorialName);
 		//this.showBlankScreen();
@@ -400,7 +402,7 @@ function _addListeners() {
 		this.stepCreationView.setTutorialTitle(tutorialName);
 
 		this.hideMenuDownBelowScreen();
-		this.showStepZeroScreen();
+		this.showStepZeroScreen(tutorialName);
 	}.bind(this));
 
 	//When the user wants to return to see all the tutorials (the landing page)
@@ -617,8 +619,9 @@ TutorialAppHomeView.prototype.hideMenuDownBelowScreen = function() {
 /*
 * Show the step 0 screen where we add items to a newly created tutorial
 */
-TutorialAppHomeView.prototype.showStepZeroScreen = function() {
+TutorialAppHomeView.prototype.showStepZeroScreen = function(tutorialName) {
 	this.lightbox.show(this.step0View);
+	this.step0View.setTutorialName(tutorialName);
 }
 
 

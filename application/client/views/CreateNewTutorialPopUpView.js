@@ -58,8 +58,15 @@ CreateNewTutorialPopUpView.prototype.finishedFunction = function(self) {
 		name: tutorialName,
 		authors: {},
 		description: '',
-		steps: []
+		steps: [],
+		items: {},
+		verbs: {}
 	}
+
+	this.setFieldInfo({
+		name: tutorialName,
+		description: ''
+	});
 
 	Meteor.call('newTutorial', docToInsert, function(error, result) {
 		if (error) {
@@ -70,4 +77,18 @@ CreateNewTutorialPopUpView.prototype.finishedFunction = function(self) {
 		}
 	});
 
+}
+
+/*
+* Returns the information ented in the form
+*/
+CreateNewTutorialPopUpView.prototype.getFieldInfo = function() {
+	return this.fieldInfo;
+}
+
+/*
+* Sets the field information object to contain the information that the user entered
+*/
+CreateNewTutorialPopUpView.prototype.setFieldInfo = function(info) {
+	this.fieldInfo = info;
 }

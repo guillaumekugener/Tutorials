@@ -18,6 +18,7 @@ AddItemsInTutorialView = function () {
     this.usersListedItems = [];
 
     this.usersSetOfItems = {};
+    this.tutorialName = undefined;
 
     _createLayouts.call(this);
     _createBodyViews.call(this);
@@ -97,6 +98,7 @@ function _createContinueToStepCreationButton() {
 	}.bind(this));
 }
 
+//Add the listeners to their surfaces
 function _addListeners() {
 	this.allItemsScrollview.on('userWantsToAddItem', function() {
 		var selected = this.allItemsScrollview.getAndReturnSelected();
@@ -132,13 +134,20 @@ AddItemsInTutorialView.prototype.addItemToUsersList = function(itemName) {
 */
 AddItemsInTutorialView.prototype.addSelectedItemsToTutorial = function() {
 
+	console.log(this.usersSetOfItems);
+	console.log(this.tutorialName);
 	//Make sure that 'item' is the name of the item and not the surface (currently, the surface)
-	for (var item in this.usersSetOfItems) {
-		Meteor.call('newItem', item, function(error, result) {
-
-		});
-	}
+	Meteor.call('addItemsToTutorial', this.usersSetOfItems, this.tutorialName, function(error, result) {} );
 }
+
+/*
+* Set the name of the tutorial that is currently being edited
+*/
+AddItemsInTutorialView.prototype.setTutorialName = function(tutorialName) {
+	this.tutorialName = tutorialName;
+	console.log(tutorialName);
+	console.log(this.tutorialName);
+};
 
 AddItemsInTutorialView.DEFAULT_OPTIONS = {
 	headerSize: 20,

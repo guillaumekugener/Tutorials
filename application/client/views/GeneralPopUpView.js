@@ -157,6 +157,9 @@ function _addListeners() {
 GeneralPopUpView.prototype = Object.create(View.prototype);
 GeneralPopUpView.prototype.constructor = GeneralPopUpView;
 
+GeneralPopUpView.prototype.getFieldInfo = function() {
+	return this.userMadeFormView.getFieldInfo();
+}
 
 
 GeneralPopUpView.DEFAULT_OPTIONS = {};

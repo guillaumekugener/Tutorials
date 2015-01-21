@@ -9,15 +9,24 @@ describe("create a new item and add it to the database", function() {
 
 		Meteor.call("newItem", newItemInfo, function(error, result) {} );
 
-		expect(Nouns.insert).toBeCalledWith({name: "PSoC 5"});
+		expect(Nouns.insert).toHaveBeenCalledWith({name: "PSoC 5"});
 
 		//An item with a blank name should not be added to the database
 		var blankItemInfo = {
 			name: ""
 		}
-		Meteor.call("newItem", blankItemInfo, function(error, result) {});
-		expect(Meteor.Errors).toHaveBeenCalled();
-		expect(Nouns.insert).not.toHaveBeenCalled();
+
+		try {
+			Meteor.methodMap.newItem(blankItemInfo);
+		}
+		catch (ex) {
+			expect(ex).toBeDefined();
+		}
+
+		expect(Meteor.methodMap.newItem).toThrow();
+		// Meteor.call("newItem", blankItemInfo, function(error, result) {});
+		// expect(Meteor.Errors).toHaveBeenCalled();
+		// expect(Nouns.insert).not.toHaveBeenCalled();
 
 
 		//An item with an undefined name should not be added to the database

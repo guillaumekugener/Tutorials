@@ -27,6 +27,10 @@ Meteor.methods({
 			throw new Meteor.Error("tutorial-name-used", "A tutorial with the name \"" + doc.name + "\" already exists");
 		}
 
+		if (doc.items == undefined || doc.verbs == undefined || doc.steps == undefined) {
+			throw new Meteor.Error("undefined-field", "All fields must be defined!");
+		}
+
 		return Tutorials.insert(doc);
 	},
 	addOrModifyStep: function(doc) {
@@ -49,5 +53,20 @@ Meteor.methods({
 	},
 	getTutorialHomeScreenInfo: function(tutorialName) {
 		return Tutorials.findOne({name: tutorialName});
+	},
+	/*
+	* Method that is given a set of items to add to the tutorials items set 
+	*/
+	addItemsToTutorial: function(items, tutorialName) {
+		var tutorialInfo = Tutorials.findOne({name: tutorialName});
+		var allItems = tutorialInfo.items;
+
+		for (var item in items) {
+			allItems[item] = true;
+		}
+
+		tutorialInfo.items = allItems;
+
+		Tutorials.update({name: tutorialName}, tutorialInfo);
 	}
 });
