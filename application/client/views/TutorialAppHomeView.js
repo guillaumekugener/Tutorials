@@ -212,7 +212,7 @@ function _createTutorialSelectedHeader() {
 
 	mainMenuIcon.on('click', function() {
 		if (this.centered) {
-			this.slideMainViewToRight();	
+			// this.slideMainViewToRight();	
 			this.slideMenuUpIntoView();		
 		}
 		else {
@@ -379,7 +379,7 @@ function _addListeners() {
 		this.slideMenuUpIntoView();
 		this.matchStepsInScrollviewToTutorial(tutorialName, this.stepsListView);
 		this.showBlankScreen();
-		this.slideMainViewToRight();
+		// this.slideMainViewToRight();
 		this.stepCreationView.setTutorialTitle(tutorialName);
 	}.bind(this));
 
@@ -441,7 +441,7 @@ function _addListeners() {
 	//Fires when the user has created a new step on the tutorial
 	this.stepCreationView.on('createdAndAddedStepToTutorial', function() {
 		this.showBlankScreen();
-		this.slideMainViewToRight();
+		//this.slideMainViewToRight();
 		this.slideMenuUpIntoView();
 		var tutorialName = this.alltutorialsScrollView.selected;
 		Meteor.call('getTutorialSteps', tutorialName, function(error, result) {
@@ -455,7 +455,7 @@ function _addListeners() {
 	//This event fires after the user has added their inital items to a newly created tutorial
 	this.step0View.on('continueToStepCreationFromStep0', function() {
 		this.showBlankScreen();
-		this.slideMainViewToRight();
+		// this.slideMainViewToRight();
 		this.slideMenuUpIntoView();
 	}.bind(this));
 }
@@ -491,7 +491,7 @@ function _createStepsListView() {
 		align: [0, 0],
 		origin: [0, 0],
 		size: [300, undefined],
-		transform: Transform.translate(0, 500, -5)
+		transform: Transform.translate(-300, 0, -5)
 	});
 
 	this.add(this.stepsListModifier).add(this.stepsListView);
