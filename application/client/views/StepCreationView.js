@@ -149,7 +149,7 @@ function _addListeners() {
 	this.creationCenterView.on('createAndAddStepToTutorial', function() {
 		var sentenceInfo = this.creationCenterView.getStepInformation();
 
-		var tutorialName = self.creationCenterView.getTitle(self.creationCenterView);
+		var tutorialName = self.creationCenterView.getTitle();
 		var stepNumber = this.creationCenterView.getStepNumber();
 
 		var stepInfoToStore = {
@@ -188,8 +188,8 @@ function _addListeners() {
 StepCreationView.prototype = Object.create(View.prototype);
 StepCreationView.prototype.constructor = StepCreationView;
 
-StepCreationView.prototype.setTitle = function(self, step, title) {
-	self.creationCenterView.setTitleToSelectedStep(self.creationCenterView, step, title);
+StepCreationView.prototype.setTitle = function(step, title) {
+	this.creationCenterView.setTitleToSelectedStep(step, title);
 }
 
 StepCreationView.prototype.populateWithStepInfo = function(stepInfo) {
@@ -200,6 +200,10 @@ StepCreationView.prototype.setTutorialTitle = function(tutorialName) {
 	this.creationCenterView.setTutorial(tutorialName);
 }
 
+/*
+* Clear all the fields in the step creation view, which means setting all of the content to be blank
+* and removing the pictures that may have been added
+*/
 StepCreationView.prototype.clearAllFields = function() {
 	this.creationCenterView.clearAllFields();
 }
@@ -211,6 +215,20 @@ StepCreationView.prototype.showAList = function(listType) {
 	else {
 		this.itemVerbListView.showItemsListView();
 	}
+}
+/*
+* Sets the information in the step creation view to the information that appeasr in the tutorials first step
+*/
+StepCreationView.prototype.setToStep1 = function() {
+	var self = this;
+
+	var tutorialName = this.creationCenterView.getTitle();
+
+	this.setTitle('Step 1', tutorialName);
+
+	Meteor.call('getTutorialStepInformation', tutorialName, 1, function(error, result) {
+		self.populateWithStepInfo(result);
+	});
 }
 
 StepCreationView.DEFAULT_OPTIONS = {};

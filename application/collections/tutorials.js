@@ -33,6 +33,14 @@ Meteor.methods({
 
 		return Tutorials.insert(doc);
 	},
+	/*
+	* A step is an object that has the following properties:
+	*	item1 -> the name of the item that appears on the left side of the sentence
+	*	item2 -> the name of the item that appears on the right side of the sentence
+	*	verb -> the verb that appears in the verb slot of the SentenceView
+	*	description -> a description of the task
+	*	img -> the id or data for the image that appears on this step
+	*/
 	addOrModifyStep: function(doc) {
 		var tutorialInfo = Tutorials.findOne({name: doc.name});
 		var previousSteps = tutorialInfo.steps;
@@ -46,6 +54,29 @@ Meteor.methods({
 		var newInfo = {name: doc.name, steps: previousSteps}
 
 		Tutorials.update({name: doc.name}, newInfo);
+	},
+	/*
+	* Given the tutorial name and the step number, returns the information linked with that step
+	* (information contained in the step object is described above)
+	*/
+	getTutorialStepInformation: function(tutorialName, stepNumber) {
+		var tutorialInfo = Tutorials.findOne({name: tutorialName});
+		var tutorialSteps = tutorialInfo.steps;
+		var stepOfInterest = tutorialSteps[stepNumber-1];
+
+		if (stepOfInterest == undefined) {
+			var blankStepInfo = {
+				item1: 'Put an item here...',
+				item2: 'Put an item here...',
+				verb: 'Put the verb here...',
+				description: '',
+				img: undefined
+			}
+
+			return blankStepInfo
+		}
+
+		return stepOfInterest;
 	},
 	getTutorialSteps: function(tutorialName) {
 		var tutorial = Tutorials.findOne({name: tutorialName});

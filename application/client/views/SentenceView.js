@@ -32,6 +32,7 @@ function _addSurfaces() {
 
 	this.leftNounSurface = new Surface({
 		size: [undefined, 50],
+		content: 'Put an item here',
 		properties: {
 			backgroundColor: '#3B5998',
 			textAlign: 'center',
@@ -49,6 +50,7 @@ function _addSurfaces() {
 
 	this.rightNounSurface = new Surface({
 		size: [undefined, 50],
+		content: 'Put an item here',
 		properties: {
 			backgroundColor: '#3B5998',
 			textAlign: 'center',
@@ -67,6 +69,7 @@ function _addSurfaces() {
 
 	this.verbSurface = new Surface({
 		size: [undefined, 50],
+		content: 'Put the verb here',
 		properties: {
 			backgroundColor: '#639BF1',
 			textAlign: 'center',

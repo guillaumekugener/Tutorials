@@ -5,7 +5,8 @@ var StateModifier = require('famous/modifiers/StateModifier');
 
 var InputSurface  = require('famous/surfaces/InputSurface');
 var ImageSurface  = require('famous/surfaces/ImageSurface');
-var FlexibleLayout = require('famous/views/FlexibleLayout')
+var FlexibleLayout = require('famous/views/FlexibleLayout');
+var TextareaSurface = require('famous/surfaces/TextareaSurface');
 
 var buttons = [];
 
@@ -16,8 +17,8 @@ CreationCenterView = function () {
 
     _createLayout.call(this);
     _addTitleSurface.call(this);
-    _addSentenceView.call(this);
     _addDescriptionBox.call(this);
+    _addSentenceView.call(this);
     _addImageDropArea.call(this);
     _addDeleteAndCreateButtons.call(this);
 
@@ -83,29 +84,31 @@ function _addDescriptionBox() {
 	var gap = new View();
 	this.descriptionMainView = new View();
 
-	var descriptionTitleSurface = new Surface({
-		content: 'Task Description',
-		//size: [undefined, 15],
-		properties: {
-			color: 'white'
-		}
+	// var descriptionTitleSurface = new Surface({
+	// 	content: 'Task Description',
+	// 	//size: [undefined, 15],
+	// 	properties: {
+	// 		color: 'white'
+	// 	}
+	// });
+
+	// var descriptionTitleModifier = new StateModifier({
+	// 	align: [0, 0],
+	// 	origin: [0, 0],
+	// 	transform: Transform.translate(0, 0, 0)
+	// });
+
+	// this.descriptionMainView.add(descriptionTitleModifier).add(descriptionTitleSurface);
+
+	this.stepDescriptionBoxSurface = new TextareaSurface({
+		placeholder: 'Enter task description here...'
 	});
-
-	var descriptionTitleModifier = new StateModifier({
-		align: [0, 0],
-		origin: [0, 0],
-		transform: Transform.translate(0, 0, 0)
-	});
-
-	this.descriptionMainView.add(descriptionTitleModifier).add(descriptionTitleSurface);
-
-	this.stepDescriptionBoxSurface = new InputSurface({});
 
 	var stepDescriptionBoxModifier = new StateModifier({
 		align: [0.5, 0],
 		origin: [0.5, 0],
 		//size: [undefined, 25],
-		transform: Transform.translate(0, 20, 0)
+		transform: Transform.translate(0, 0, 0)
 	});
 
 	this.descriptionMainView.add(stepDescriptionBoxModifier).add(this.stepDescriptionBoxSurface);
@@ -149,6 +152,9 @@ function _imageDropAreaListeners() {
 
 }
 
+/*
+* The function below are all part of the drag and drop event for the tutorial image
+*/
 function noopHandler(evt) {
 	evt.stopPropagation();
 	evt.preventDefault();
@@ -182,7 +188,7 @@ function handleReaderLoad(evt) {
 	var img = document.getElementById("preview");
 	img.src = evt.target.result;
 }
-
+//End of the drag and drop functions
 
 
 function _addDeleteAndCreateButtons() {
@@ -266,13 +272,13 @@ function _addListeners() {
 CreationCenterView.prototype = Object.create(View.prototype);
 CreationCenterView.prototype.constructor = CreationCenterView;
 
-CreationCenterView.prototype.setTitleToSelectedStep = function(self, selectedStepName, selectedTutorial) {
-	self.titleSurface.setContent(selectedStepName);
-	self.tutorialTitle = selectedTutorial;
+CreationCenterView.prototype.setTitleToSelectedStep = function(selectedStepName, selectedTutorial) {
+	this.titleSurface.setContent(selectedStepName);
+	this.tutorialTitle = selectedTutorial;
 }
 
-CreationCenterView.prototype.getTitle = function(self) {
-	return self.tutorialTitle;
+CreationCenterView.prototype.getTitle = function() {
+	return this.tutorialTitle;
 }
 
 CreationCenterView.prototype.setTutorial = function(tutorialTitle) {

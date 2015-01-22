@@ -10,6 +10,7 @@ var Scrollview    = require('famous/views/Scrollview');
 
 var Lightbox      = require('famous/views/Lightbox');
 var Easing        = require('famous/transitions/Easing');
+var SequentialLayout = require('famous/views/SequentialLayout');
 
 var headerViews = [];
 var tutorialsInView = [];
@@ -31,6 +32,7 @@ TutorialAppHomeView = function () {
     _createStepsListView.call(this);
     _createTutorialSelectedHeader.call(this);
     _createAddItemsInTutorialView.call(this);
+    _createNavigationMenu.call(this);
 
 
     _addListeners.call(this);
@@ -41,7 +43,7 @@ TutorialAppHomeView = function () {
     this.flexibleHeader.sequenceFrom(headerViews);
 
 }
-//Creating a slightlt transparent background for when the user first selects a tutorial
+//Creating a slightly transparent background for when the user first selects a tutorial
 function _createBlankBackgroundScreen() {
 	this.blankScreenView = new View();
 
@@ -49,7 +51,7 @@ function _createBlankBackgroundScreen() {
 		size: [undefined, undefined],
 		content: '<=== Select or create a step!',
 		properties: {
-			backgroundColor: 'black',
+			backgroundColor: 'red',
 			color: 'white'
 		}
 	});
@@ -57,7 +59,8 @@ function _createBlankBackgroundScreen() {
 	var backgroundModifier = new StateModifier({
 		align: [0.5, 0.5],
 		origin: [0.5, 0.5],
-		opacity: 0.5
+		opacity: 0.2,
+		transform: Transform.translate(0, 0, 200)
 	});
 
 	this.blankScreenView.add(backgroundModifier).add(whiteSurface);
@@ -264,7 +267,7 @@ function _createTutorialSelectedHeader() {
 					self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
 					self.showStepCreationView();
 					self.slideMainViewBackToCenter();
-					self.stepCreationView.setTitle(self.stepCreationView, 'Step ' + goToStep, tutorialName);
+					self.stepCreationView.setTitle('Step ' + goToStep, tutorialName);
 				});
 			}
 		}
@@ -316,7 +319,7 @@ function _createTutorialSelectedHeader() {
 					self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
 					self.showStepCreationView();
 					self.slideMainViewBackToCenter();
-					self.stepCreationView.setTitle(self.stepCreationView, 'Step ' + goToStep, tutorialName);
+					self.stepCreationView.setTitle('Step ' + goToStep, tutorialName);
 				}
 			});
 		}
@@ -376,11 +379,13 @@ function _addListeners() {
 		var tutorialName = this.alltutorialsScrollView.selected;
 		this.stepCreationView.setTutorialTitle(tutorialName);
 		this.changeToSelectedTutorialNavBar(tutorialName);
-		this.slideMenuUpIntoView();
+		//this.slideMenuUpIntoView();
 		this.matchStepsInScrollviewToTutorial(tutorialName, this.stepsListView);
-		this.showBlankScreen();
+		//this.showBlankScreen();
 		// this.slideMainViewToRight();
 		this.stepCreationView.setTutorialTitle(tutorialName);
+		this.showStepCreationView();
+		this.stepCreationView.setToStep1();
 	}.bind(this));
 
 	var self = this;
@@ -406,7 +411,7 @@ function _addListeners() {
 	}.bind(this));
 
 	//When the user wants to return to see all the tutorials (the landing page)
-	this.stepsListView.on('returnToAllTutorialsView', function() {
+	this.navigationMenu.on('homeButtonClicked', function() {
 		this.centered = true;
 		this.slideMainViewBackToCenter();
 		this.hideMenuDownBelowScreen();
@@ -434,7 +439,7 @@ function _addListeners() {
 			self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
 			self.showStepCreationView();
 			self.slideMainViewBackToCenter();
-			self.stepCreationView.setTitle(self.stepCreationView, 'Step ' + stepName, tutorialName);
+			self.stepCreationView.setTitle('Step ' + stepName, tutorialName);
 		});
 	}.bind(this));
 
@@ -503,8 +508,28 @@ function _createStepsListView() {
 */
 function _createAddItemsInTutorialView() {
 	this.step0View = new AddItemsInTutorialView();
+}
 
+/*
+* Creates the left hand side navigation bar that allows the user to navigate back to the main home screen
+* or to their account
+*/
+function _createNavigationMenu() {
+	//Make it into a sequential layout where the opaque view is the second view added
+	this.navBarSequentialLayout = new SequentialLayout({
 
+	});
+
+	this.navigationMenu = new SideMenuView();
+
+	this.navigationMenuModifier = new StateModifier({
+		align: [0, 0],
+		origin: [0, 0],
+		size: [300, undefined],
+		transform: Transform.translate(-300, 0, -5)
+	});
+
+	this.add(this.navigationMenuModifier).add(this.navigationMenu);
 }
 
 
@@ -562,7 +587,7 @@ TutorialAppHomeView.prototype.hideCreateNewTutorialPopUp = function () {
 * Slide the main view to the right to display a menu
 */
 TutorialAppHomeView.prototype.slideMainViewToRight = function() {
-	this.layoutModifier.setTransform(Transform.translate(300, 0, 0), {
+	this.layoutModifier.setTransform(Transform.translate(300, 40, 0), {
 		duration: 300,
 		curve: 'easeOut'
 	});
@@ -600,7 +625,14 @@ TutorialAppHomeView.prototype.matchStepsInScrollviewToTutorial = function(tutori
 * Slide the left hand side menu so that the user can see it
 */
 TutorialAppHomeView.prototype.slideMenuUpIntoView = function() {
-	this.stepsListModifier.setTransform(Transform.translate(0, 0, 10), {
+	// this.stepsListModifier.setTransform(Transform.translate(0, 0, 10), {
+	// 	duration: 300,
+	// 	curve: 'easeOut'
+	// });
+
+	this.slideMainViewToRight();
+
+	this.navigationMenuModifier.setTransform(Transform.translate(0, 0, 100), {
 		duration: 300,
 		curve: 'easeOut'
 	});
@@ -610,7 +642,14 @@ TutorialAppHomeView.prototype.slideMenuUpIntoView = function() {
 * Hide the left hand side menu for the user's view
 */
 TutorialAppHomeView.prototype.hideMenuDownBelowScreen = function() {
-	this.stepsListModifier.setTransform(Transform.translate(-300, 0, -5), {
+	// this.stepsListModifier.setTransform(Transform.translate(-300, 0, -5), {
+	// 	duration: 300,
+	// 	curve: 'easeOut'
+	// });
+
+	this.slideMainViewBackToCenter();
+
+	this.navigationMenuModifier.setTransform(Transform.translate(-300, 0, -5), {
 		duration: 300,
 		curve: 'easeOut'
 	});
