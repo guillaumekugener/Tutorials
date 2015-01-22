@@ -45,11 +45,25 @@ Meteor.methods({
 		var tutorialInfo = Tutorials.findOne({name: doc.name});
 		var previousSteps = tutorialInfo.steps;
 
+		console.log('modifiying... ' + (doc.stepNumber-1));
+
 		if (typeof doc.stepNumber === 'number' && doc.stepNumber < previousSteps.length) {
-			previousSteps[doc.stepNumber] = {item1: doc.item1, item2: doc.item2, verb: doc.verb};
+			previousSteps[doc.stepNumber-1] = {
+				item1: doc.item1, 
+				item2: doc.item2, 
+				verb: doc.verb,
+				description: '',
+				img: ''
+			};
 		}
 		else {
-			previousSteps.push({item1: doc.item1, item2: doc.item2, verb: doc.verb});
+			previousSteps.push({
+				item1: doc.item1, 
+				item2: doc.item2, 
+				verb: doc.verb,
+				description: '',
+				img: ''
+			});
 		}
 		var newInfo = {name: doc.name, steps: previousSteps}
 
@@ -63,6 +77,8 @@ Meteor.methods({
 		var tutorialInfo = Tutorials.findOne({name: tutorialName});
 		var tutorialSteps = tutorialInfo.steps;
 		var stepOfInterest = tutorialSteps[stepNumber-1];
+
+		console.log('getting information for step ' + (stepNumber-1));
 
 		if (stepOfInterest == undefined) {
 			var blankStepInfo = {

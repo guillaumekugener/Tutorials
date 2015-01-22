@@ -255,22 +255,32 @@ function _createTutorialSelectedHeader() {
 	var self = this;
 
 	this.previousStepView.surface.on('click', function() {
-		var stepNumber = this.stepsListView.getSelected();
-		if (stepNumber !== 'new') {
-			if (stepNumber > 0) {
-				var tutorialName = this.alltutorialsScrollView.selected;
-				this.centered = true;
-				var goToStep = stepNumber - 1;
-				this.stepsListView.setSelectedStep(goToStep);
-				Meteor.call('getTutorialSteps', tutorialName, function(error, result) {
-					var stepOfInterestInfo = result[stepNumber];
-					self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
-					self.showStepCreationView();
-					self.slideMainViewBackToCenter();
-					self.stepCreationView.setTitle('Step ' + goToStep, tutorialName);
-				});
-			}
+		// var stepNumber = this.stepsListView.getSelected();
+		// if (stepNumber !== 'new') {
+		// 	if (stepNumber > 0) {
+		// 		var tutorialName = this.alltutorialsScrollView.selected;
+		// 		this.centered = true;
+		// 		var goToStep = stepNumber - 1;
+		// 		this.stepsListView.setSelectedStep(goToStep);
+		// 		Meteor.call('getTutorialSteps', tutorialName, function(error, result) {
+		// 			var stepOfInterestInfo = result[stepNumber];
+		// 			self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
+		// 			self.showStepCreationView();
+		// 			self.slideMainViewBackToCenter();
+		// 			self.stepCreationView.setTitle('Step ' + goToStep, tutorialName);
+		// 		});
+		// 	}
+		// }
+
+		var currentStep = this.stepCreationView.getCurrentStep();
+		this.stepCreationView.saveStepInformation();
+		//Modify the current step (save the info)
+		///
+		if (currentStep !== 1) {
+			var previousStep = currentStep - 1;
+			this.stepCreationView.setToStep(previousStep);	
 		}
+
 	}.bind(this));
 
 	this.previousStepView.add(this.previousStepView.surface);
@@ -305,24 +315,41 @@ function _createTutorialSelectedHeader() {
 	});
 
 	this.nextStepView.surface.on('click', function() {
-		var stepNumber = this.stepsListView.getSelected();
-		if (stepNumber !== 'new') {
-			var goToStep = stepNumber + 1;
-			var tutorialName = this.alltutorialsScrollView.selected;
-			this.centered = true;
-			var numOfSteps = 0;
-			Meteor.call('getTutorialSteps', tutorialName, function(error, result) {
-				var stepOfInterestInfo = result[stepNumber];
-				numOfSteps = result.length;
-				if (numOfSteps > goToStep) {
-					self.stepsListView.setSelectedStep(goToStep);
-					self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
-					self.showStepCreationView();
-					self.slideMainViewBackToCenter();
-					self.stepCreationView.setTitle('Step ' + goToStep, tutorialName);
-				}
-			});
-		}
+		// var stepNumber = this.stepsListView.getSelected();
+		// if (stepNumber !== 'new') {
+		// 	var goToStep = stepNumber + 1;
+		// 	var tutorialName = this.alltutorialsScrollView.selected;
+		// 	this.centered = true;
+		// 	var numOfSteps = 0;
+		// 	Meteor.call('getTutorialSteps', tutorialName, function(error, result) {
+		// 		var stepOfInterestInfo = result[stepNumber];
+		// 		numOfSteps = result.length;
+		// 		if (numOfSteps > goToStep) {
+		// 			self.stepsListView.setSelectedStep(goToStep);
+		// 			self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
+		// 			self.showStepCreationView();
+		// 			self.slideMainViewBackToCenter();
+		// 			self.stepCreationView.setTitle('Step ' + goToStep, tutorialName);
+		// 		}
+		// 	});
+		// }
+
+		/*
+		* The button should do one of two things:
+		*	1. Move to the next step of the tutorial (obviously)
+		*	2. If the user is on the last step, should create a new step
+		* It should also either automatically save the user's changes or ask if they want to save their edits
+		* (automatically will probably be the implementation);
+		*/
+
+		var currentStep = this.stepCreationView.getCurrentStep();
+		this.stepCreationView.saveStepInformation();
+		//Modify the current step (save the info)
+		///
+		var nextStep = currentStep + 1;
+		this.stepCreationView.setToStep(nextStep);
+
+
 
 	}.bind(this));
 

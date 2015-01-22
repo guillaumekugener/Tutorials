@@ -11,6 +11,8 @@ var views = [];
 StepCreationView = function () {
     View.apply(this, arguments);
 
+    this.currentStep = undefined;
+
     _createBackground.call(this);
     _createLayout.call(this);
 
@@ -220,15 +222,40 @@ StepCreationView.prototype.showAList = function(listType) {
 * Sets the information in the step creation view to the information that appeasr in the tutorials first step
 */
 StepCreationView.prototype.setToStep1 = function() {
+	this.setToStep(1);
+}
+
+/*
+* Get the current step that the user is viewing
+*/
+StepCreationView.prototype.getCurrentStep = function() {
+	return this.currentStep;
+}
+
+/*
+* Set the information that is being displayed to the stepNumber passed into the funciton
+*/
+StepCreationView.prototype.setToStep = function(stepNumber) {
 	var self = this;
 
 	var tutorialName = this.creationCenterView.getTitle();
+	this.setTitle('Step ' + stepNumber, tutorialName);
+	this.currentStep = stepNumber;
 
-	this.setTitle('Step 1', tutorialName);
-
-	Meteor.call('getTutorialStepInformation', tutorialName, 1, function(error, result) {
+	Meteor.call('getTutorialStepInformation', tutorialName, stepNumber, function(error, result) {
 		self.populateWithStepInfo(result);
 	});
+}
+
+/*
+* Save all of the information that the user entered for this step
+*/
+StepCreationView.prototype.saveStepInformation = function() {
+	var stepInfo = this.creationCenterView.getStepInformation();
+
+	stepInfo.stepNumber = this.getCurrentStep();
+
+	Meteor.call('addOrModifyStep', stepInfo, function(error, result) {} );
 }
 
 StepCreationView.DEFAULT_OPTIONS = {};

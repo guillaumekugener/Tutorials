@@ -55,5 +55,5 @@ describe("tests for the nouns collection on the server", function() {
 		//Now run the search funciton and make sure it returns the expected results. Need to figure out how to do
 		//this while getting around the fact that Meteor.call is asynchronous
 
-
-})
+	});
+});

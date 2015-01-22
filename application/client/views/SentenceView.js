@@ -194,13 +194,13 @@ SentenceView.prototype.setSurfaceContent = function(surfaceName, content) {
 }
 
 SentenceView.prototype.getSentenceContent = function() {
-	console.log('well well well');
+	//Content might be put noun here... which might be a problem or not
+
 	var info = {
 		leftNoun: this.leftNounSurface.getContent(),
 		rightNoun: this.rightNounSurface.getContent(),
 		verb: this.verbSurface.getContent()
 	};
-	console.log(info);
 	return info;
 }
 

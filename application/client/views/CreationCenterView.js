@@ -303,13 +303,22 @@ CreationCenterView.prototype.setSurfaceContent = function(surfaceName, content) 
 }
 
 CreationCenterView.prototype.getStepInformation = function() {
-	return this.sentenceView.getSentenceContent();
+	var stepInfoToSave = {};
+
+	var keywords = this.sentenceView.getSentenceContent();
+	var tutorialTitle = this.getTitle();
+
+	stepInfoToSave.name = tutorialTitle;
+	stepInfoToSave.item1 = keywords.leftNoun;
+	stepInfoToSave.item2 = keywords.rightNoun;
+	stepInfoToSave.verb = keywords.verb;
+
+	return stepInfoToSave;
 }
 
 CreationCenterView.prototype.getStepNumber = function() {
 	var stepTitle = this.titleSurface.getContent();
 	var stepNumber = parseInt(stepTitle.split(' ')[1]);
-	console.log(stepNumber);
 	return stepNumber;
 }
 
