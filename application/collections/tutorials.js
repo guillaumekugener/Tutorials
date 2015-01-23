@@ -45,9 +45,10 @@ Meteor.methods({
 		var tutorialInfo = Tutorials.findOne({name: doc.name});
 		var previousSteps = tutorialInfo.steps;
 
-		console.log('modifiying... ' + (doc.stepNumber-1));
-
-		if (typeof doc.stepNumber === 'number' && doc.stepNumber < previousSteps.length) {
+		console.log('modifiying... ' + (doc.stepNumber));
+		//This needs to be fixed!! Adding some elements twice
+		// if (typeof doc.stepNumber === 'number' && doc.stepNumber < previousSteps.length) {
+		if (previousSteps[doc.stepNumber-1] !== undefined) {
 			previousSteps[doc.stepNumber-1] = {
 				item1: doc.item1, 
 				item2: doc.item2, 
@@ -76,9 +77,11 @@ Meteor.methods({
 	getTutorialStepInformation: function(tutorialName, stepNumber) {
 		var tutorialInfo = Tutorials.findOne({name: tutorialName});
 		var tutorialSteps = tutorialInfo.steps;
+		console.log(tutorialSteps);
 		var stepOfInterest = tutorialSteps[stepNumber-1];
 
-		console.log('getting information for step ' + (stepNumber-1));
+		console.log('getting information for step ' + (stepNumber));
+		console.log(stepOfInterest);
 
 		if (stepOfInterest == undefined) {
 			var blankStepInfo = {

@@ -244,6 +244,7 @@ StepCreationView.prototype.setToStep = function(stepNumber) {
 
 	Meteor.call('getTutorialStepInformation', tutorialName, stepNumber, function(error, result) {
 		self.populateWithStepInfo(result);
+		console.log(result);
 	});
 }
 

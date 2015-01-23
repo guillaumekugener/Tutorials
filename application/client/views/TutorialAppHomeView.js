@@ -486,9 +486,11 @@ function _addListeners() {
 
 	//This event fires after the user has added their inital items to a newly created tutorial
 	this.step0View.on('continueToStepCreationFromStep0', function() {
-		this.showBlankScreen();
+		//this.showBlankScreen();
 		// this.slideMainViewToRight();
-		this.slideMenuUpIntoView();
+		//this.slideMenuUpIntoView();
+		this.showStepCreationView();
+		this.stepCreationView.setToStep1();
 	}.bind(this));
 }
 
