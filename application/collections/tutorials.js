@@ -45,7 +45,6 @@ Meteor.methods({
 		var tutorialInfo = Tutorials.findOne({name: doc.name});
 		var previousSteps = tutorialInfo.steps;
 
-		console.log('modifiying... ' + (doc.stepNumber));
 		//This needs to be fixed!! Adding some elements twice
 		// if (typeof doc.stepNumber === 'number' && doc.stepNumber < previousSteps.length) {
 		if (previousSteps[doc.stepNumber-1] !== undefined) {
@@ -53,7 +52,7 @@ Meteor.methods({
 				item1: doc.item1, 
 				item2: doc.item2, 
 				verb: doc.verb,
-				description: '',
+				description: doc.description,
 				img: ''
 			};
 		}
@@ -62,7 +61,7 @@ Meteor.methods({
 				item1: doc.item1, 
 				item2: doc.item2, 
 				verb: doc.verb,
-				description: '',
+				description: doc.description,
 				img: ''
 			});
 		}
@@ -77,18 +76,14 @@ Meteor.methods({
 	getTutorialStepInformation: function(tutorialName, stepNumber) {
 		var tutorialInfo = Tutorials.findOne({name: tutorialName});
 		var tutorialSteps = tutorialInfo.steps;
-		console.log(tutorialSteps);
 		var stepOfInterest = tutorialSteps[stepNumber-1];
-
-		console.log('getting information for step ' + (stepNumber));
-		console.log(stepOfInterest);
 
 		if (stepOfInterest == undefined) {
 			var blankStepInfo = {
 				item1: 'Put an item here...',
 				item2: 'Put an item here...',
 				verb: 'Put the verb here...',
-				description: '',
+				description: null,
 				img: undefined
 			}
 

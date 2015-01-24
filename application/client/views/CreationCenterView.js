@@ -79,26 +79,12 @@ function _addSentenceView() {
 	this.viewsInCreationView.push(this.sentenceView);
 }
 
-
+/*
+* Adds the description text box where the user can enter the description of the step
+*/
 function _addDescriptionBox() {
 	var gap = new View();
 	this.descriptionMainView = new View();
-
-	// var descriptionTitleSurface = new Surface({
-	// 	content: 'Task Description',
-	// 	//size: [undefined, 15],
-	// 	properties: {
-	// 		color: 'white'
-	// 	}
-	// });
-
-	// var descriptionTitleModifier = new StateModifier({
-	// 	align: [0, 0],
-	// 	origin: [0, 0],
-	// 	transform: Transform.translate(0, 0, 0)
-	// });
-
-	// this.descriptionMainView.add(descriptionTitleModifier).add(descriptionTitleSurface);
 
 	this.stepDescriptionBoxSurface = new TextareaSurface({
 		placeholder: 'Enter task description here...'
@@ -284,9 +270,12 @@ CreationCenterView.prototype.getTitle = function() {
 CreationCenterView.prototype.setTutorial = function(tutorialTitle) {
 	this.tutorialTitle = tutorialTitle;
 }
-
+/*
+* Populate the step creation view surfaces with the content from the step currently being viewed
+*/
 CreationCenterView.prototype.populateWithStepInfo = function(stepInfo) {
 	this.sentenceView.populateWithStepInfoData(stepInfo);
+	this.stepDescriptionBoxSurface.setValue(stepInfo.description);
 }
 
 CreationCenterView.prototype.clearAllFields = function() {
@@ -307,11 +296,13 @@ CreationCenterView.prototype.getStepInformation = function() {
 
 	var keywords = this.sentenceView.getSentenceContent();
 	var tutorialTitle = this.getTitle();
+	var description = this.stepDescriptionBoxSurface.getValue();
 
 	stepInfoToSave.name = tutorialTitle;
 	stepInfoToSave.item1 = keywords.leftNoun;
 	stepInfoToSave.item2 = keywords.rightNoun;
 	stepInfoToSave.verb = keywords.verb;
+	stepInfoToSave.description = description;
 
 	return stepInfoToSave;
 }
