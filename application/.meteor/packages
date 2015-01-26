@@ -11,3 +11,5 @@ raix:famono
 sanjo:jasmine
 velocity:html-reporter
 less
+accounts-base
+accounts-password
