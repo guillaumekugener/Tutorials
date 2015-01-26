@@ -12,11 +12,33 @@ var InputSurface = require('famous/surfaces/InputSurface');
 LoginView = function () {
     View.apply(this, arguments);
 
+    _addBackgroundSurface.call(this);
     _topLoginViewTitleSurface.call(this);
     _addUsernameInputSurface.call(this);
     _addPasswordInputSurface.call(this);
     _addVerificationSurface.call(this);
     _addSignUpAndLoginButtons.call(this);
+
+    _addListeners.call(this);
+}
+
+/*
+* Create the background of the login screen
+*/
+function _addBackgroundSurface() {
+	var backgroundSurface = new Surface({
+		properties: {
+			backgroundColor: 'grey',
+			border: '1px solid black'
+		}
+	});
+
+	var backgroundModifier = new StateModifier({
+		size: [undefined, undefined],
+		transform: Transform.translate(0, 0, -1)
+	});
+
+	this.add(backgroundModifier).add(backgroundSurface);
 }
 
 /*
@@ -77,7 +99,7 @@ function _addPasswordInputSurface() {
 */
 function _addVerificationSurface() {
 	this.verificationSurface = new InputSurface({
-		placeholder: 'password',
+		placeholder: 'verify password (for signing up only)',
 		size: [this.options.inputSurfaceWidth, this.options.inputSurfaceHeight],
 		type: 'password'
 	});
@@ -96,39 +118,43 @@ function _addVerificationSurface() {
 */
 function _addSignUpAndLoginButtons() {
 	this.loginButtonSurface = new Surface({
-		contet: 'login',
+		content: 'login',
 		size: [this.options.loginButtonsWidth, this.options.inputSurfaceHeight],
 		properties: {
-			textAlign: 'center'
+			textAlign: 'center',
+			backgroundColor: 'green'
 		}
 	});
 
 	var loginButtonModifier = new StateModifier({
-		algin: [0.5, 0],
-		orgin: [0.5, 0],
-		transform: Transform.translate(-55, 160, 0)
+		align: [0.5, 0],
+		origin: [0.5, 0],
+		transform: Transform.translate(-80, 160, 0)
 	});
 
 	this.add(loginButtonModifier).add(this.loginButtonSurface);
 
 	this.signUpButtonSurface = new Surface({
-		contet: 'sign up',
+		content: 'sign up',
 		size: [this.options.loginButtonsWidth, this.options.inputSurfaceHeight],
 		properties: {
-			textAlign: 'center'
+			textAlign: 'center',
+			backgroundColor: 'blue'
 		}		
 	});
 
 	var signUpButtonModifier = new StateModifier({
-		algin: [0.5, 0],
-		orgin: [0.5, 0],
-		transform: Transform.translate(55, 160, 0)
+		align: [0.5, 0],
+		origin: [0.5, 0],
+		transform: Transform.translate(80, 160, 0)
 	});
 
 	this.add(signUpButtonModifier).add(this.signUpButtonSurface);
 }
 
 function _addListeners() {
+	var self = this;
+
 	/*
 	* In the case of a sign up rather than a login
 	*/
@@ -137,6 +163,7 @@ function _addListeners() {
 		var password = this.passwordInputSurface.getValue();
 		var verification = this.verificationSurface.getValue();
 
+		console.log('clicked sign up');
 		if (password !== verification) {
 			//Notify user that the password and verifier do not match
 		}
@@ -144,10 +171,14 @@ function _addListeners() {
 			Accounts.createUser({email: email, password:password}, function(error) {
 				if (error) {
 					//Inform the user that account creation failed
+					console.log('error');
 				}
 				else {
 					//Success! Account has been created and the suer has logged in successfully
 					//Fire the show everything event here
+					console.log('account created');
+					//Proceed to show the main tutorial app view
+					self._eventOutput.emit('createdAnAccount');
 				}
 			});
 		}
@@ -166,6 +197,7 @@ function _addListeners() {
 			}
 			else {
 				//They logged in, fire the show everything event
+				self._eventOutput.emit('loggedInAnAccount');
 			}
 		});
 	}.bind(this));
@@ -178,7 +210,7 @@ LoginView.prototype = Object.create(View.prototype);
 LoginView.prototype.constructor = LoginView;
 
 LoginView.DEFAULT_OPTIONS = {
-	inputSurfaceWidth: 200,
+	inputSurfaceWidth: 250,
 	inputSurfaceHeight: 20,
 	loginButtonsWidth: 90
 };
