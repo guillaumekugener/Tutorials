@@ -130,6 +130,7 @@ function _createHeader() {
 	headerViews.push(iconView);
 
 	this.headerSearchBarView = new SearchBarView();
+	this.headerSearchBarView.setPlaceholder("search for a tutorial...");
 
 	var gapView1 = new View();
 	headerViews.push(gapView1);

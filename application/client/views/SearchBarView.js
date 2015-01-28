@@ -14,7 +14,7 @@ SearchBarView = function () {
 
 function _createSearchSurfaces() {
 	this.searchBarSurface = new InputSurface({
-		size: [undefined, 25]
+		size: [undefined, 25],
 	});
 
 	this.add(this.searchBarSurface);
@@ -40,6 +40,13 @@ SearchBarView.prototype.setSize = function(size) {
 
 SearchBarView.prototype.getContent = function() {
 	return this.searchBarSurface.getValue();
+}
+
+/*
+* Set the placeholder for the searchbar
+*/
+SearchBarView.prototype.setPlaceholder = function(placeholder) {
+	this.searchBarSurface.setPlaceholder(placeholder);
 }
 
 

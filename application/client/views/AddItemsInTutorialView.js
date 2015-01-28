@@ -61,6 +61,8 @@ function _createBodyViews() {
 	this.allItemsScrollview = new SearchableItemsListView();
 	this.bodyFlexibleLayoutViews.push(this.allItemsScrollview);
 
+	this.allItemsScrollview.setPlaceholder('search for an item in the database');
+
 	var middleGap = new View();
 	this.bodyFlexibleLayoutViews.push(middleGap);
 
@@ -69,6 +71,20 @@ function _createBodyViews() {
 
 	var rightHandGap = new View();
 	this.bodyFlexibleLayoutViews.push(rightHandGap);
+
+	this.formPopUp = new AddItemOrVerbFormView();
+
+	this.formPopUp.setType('nouns');
+	
+	this.formPopUpModifier = new StateModifier({
+		transform: Transform.translate(0, 0, 10)
+	});
+
+	this.formPopUpModifier.setVisible(false);
+
+	this.add(this.formPopUpModifier).add(this.formPopUp);
+
+	this.allItemsScrollview.addRightSideIcon('img/plus.png');
 }
 
 /*
@@ -104,6 +120,16 @@ function _addListeners() {
 		var selected = this.allItemsScrollview.getAndReturnSelected();
 		this.addItemToUsersList(selected.name);
 	}.bind(this));
+
+	this.allItemsScrollview.on('searchableListRightSideIconClicked', function() {
+		this.formPopUpModifier.setVisible(true);
+	}.bind(this));
+
+	this.formPopUp.on('hideForm', function() {
+		this.formPopUpModifier.setVisible(false);
+		//Add it to users list? Should the form actually be on the left side or should it be part of the right
+		//hand side list...
+	}.bind(this));
 }
 
 AddItemsInTutorialView.prototype = Object.create(View.prototype);
@@ -133,9 +159,6 @@ AddItemsInTutorialView.prototype.addItemToUsersList = function(itemName) {
 * once step 0 is complete)
 */
 AddItemsInTutorialView.prototype.addSelectedItemsToTutorial = function() {
-
-	console.log(this.usersSetOfItems);
-	console.log(this.tutorialName);
 	//Make sure that 'item' is the name of the item and not the surface (currently, the surface)
 	Meteor.call('addItemsToTutorial', this.usersSetOfItems, this.tutorialName, function(error, result) {} );
 }
@@ -145,8 +168,6 @@ AddItemsInTutorialView.prototype.addSelectedItemsToTutorial = function() {
 */
 AddItemsInTutorialView.prototype.setTutorialName = function(tutorialName) {
 	this.tutorialName = tutorialName;
-	console.log(tutorialName);
-	console.log(this.tutorialName);
 };
 
 AddItemsInTutorialView.DEFAULT_OPTIONS = {
