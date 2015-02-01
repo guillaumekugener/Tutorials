@@ -3,3 +3,11 @@
 	max-width: 100%;
 }
 
+.dropbox {	
+	background-color: black;
+	opacity: 0.2;
+	border: 3px dotted white;
+	text-align: center;
+	color: white;
+	padding-top: 50px;
+}

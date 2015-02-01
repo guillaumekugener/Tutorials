@@ -9,8 +9,10 @@ var InputSurface = require('famous/surfaces/InputSurface');
 * The view that appears when the uerse first accesses the site without being logged in to an account.
 * Here they will have the opportunity to login or to create an account in order to login
 */
-LoginView = function () {
+LoginView = function (size) {
     View.apply(this, arguments);
+
+    this.dimensions = size;
 
     _addBackgroundSurface.call(this);
     _topLoginViewTitleSurface.call(this);
@@ -18,6 +20,7 @@ LoginView = function () {
     _addPasswordInputSurface.call(this);
     _addVerificationSurface.call(this);
     _addSignUpAndLoginButtons.call(this);
+    _addForgotPasswordNewUserButtons.call(this);
 
     _addListeners.call(this);
 }
@@ -28,7 +31,7 @@ LoginView = function () {
 function _addBackgroundSurface() {
 	var backgroundSurface = new Surface({
 		properties: {
-			backgroundColor: 'grey',
+			backgroundColor: '#50BFA4',
 			border: '1px solid black'
 		}
 	});
@@ -46,10 +49,15 @@ function _addBackgroundSurface() {
 */
 function _topLoginViewTitleSurface() {
 	var memberLoginSurface = new Surface({
-		content: 'account login',
+		content: 'Welcome',
 		size: [undefined, 20],
 		properties: {
-			textAlign: 'center'
+			textAlign: 'center',
+			fontSize: '1.875em',
+			fontStyle: 'italic',
+			paddingTop: '5px',
+			fontWeight: '800',
+			color: 'white'
 		}
 	});
 
@@ -63,8 +71,11 @@ function _addUsernameInputSurface() {
 	this.usernameInputSurface = new InputSurface({
 		placeholder: 'username',
 		size: [this.options.inputSurfaceWidth, this.options.inputSurfaceHeight],
-		type: 'email'
+		type: 'email',
+		classes: ['loginInputs', 'username']
 	});
+
+	//this.usernameInputSurface.addClass('username');
 
 	var usernameInputModifier = new StateModifier({
 		align: [0.5, 0],
@@ -82,8 +93,12 @@ function _addPasswordInputSurface() {
 	this.passwordInputSurface = new InputSurface({
 		placeholder: 'password',
 		size: [this.options.inputSurfaceWidth, this.options.inputSurfaceHeight],
-		type: 'password'
+		type: 'password',
+		classes: ['loginInputs', 'passwords']
 	});
+
+	//this.passwordInputSurface.addClass('passwords');
+
 
 	var passwordInputModifier = new StateModifier({
 		align: [0.5, 0],
@@ -99,15 +114,20 @@ function _addPasswordInputSurface() {
 */
 function _addVerificationSurface() {
 	this.verificationSurface = new InputSurface({
-		placeholder: 'verify password (for signing up only)',
+		placeholder: 'verify password',
 		size: [this.options.inputSurfaceWidth, this.options.inputSurfaceHeight],
-		type: 'password'
+		type: 'password',
+		classes: ['loginInputs'],
+		properties: {
+			visibility: 'hidden',
+			borderRadius: '5px'
+		}
 	});
 
 	var verificationModifier = new StateModifier({
 		align: [0.5, 0],
 		origin: [0.5, 0],
-		transform: Transform.translate(0, 120, 0)
+		transform: Transform.translate(0, 140, 0)
 	});
 
 	this.add(verificationModifier).add(this.verificationSurface);
@@ -119,17 +139,21 @@ function _addVerificationSurface() {
 function _addSignUpAndLoginButtons() {
 	this.loginButtonSurface = new Surface({
 		content: 'login',
-		size: [this.options.loginButtonsWidth, this.options.inputSurfaceHeight],
+		size: [this.options.inputSurfaceWidth, this.options.inputSurfaceHeight],
 		properties: {
 			textAlign: 'center',
-			backgroundColor: 'green'
+			backgroundColor: '#F8C408',
+			borderRadius: '5px',
+			fontStyle: 'italic',
+			fontSize: '1.5em',
+			paddingTop: '8px'
 		}
 	});
 
 	var loginButtonModifier = new StateModifier({
 		align: [0.5, 0],
 		origin: [0.5, 0],
-		transform: Transform.translate(-80, 160, 0)
+		transform: Transform.translate(0, 200, 0)
 	});
 
 	this.add(loginButtonModifier).add(this.loginButtonSurface);
@@ -149,57 +173,105 @@ function _addSignUpAndLoginButtons() {
 		transform: Transform.translate(80, 160, 0)
 	});
 
-	this.add(signUpButtonModifier).add(this.signUpButtonSurface);
+	// this.add(signUpButtonModifier).add(this.signUpButtonSurface);
+}
+
+/*
+* Add the register user button and the forgot password buttons
+*/
+function _addForgotPasswordNewUserButtons() {
+	this.forgotPasswordButtonSurface = new Surface({
+		content: 'forgot password?',
+		classes: ['path']
+	});
+
+	this.forgotPasswordButtonModifier = new StateModifier({
+		align: [0, 1],
+		origin: [0, 1],
+		transform: Transform.translate(5, this.dimensions[1]-20, 0)
+	});
+
+	this.add(this.forgotPasswordButtonModifier).add(this.forgotPasswordButtonSurface);
+
+	this.newUserButtonSurface = new Surface({
+		content: 'create an account'
+	});
+
+	this.newUserButtonSurface.addClass('path');
+
+	this.newUserButtonModifier = new StateModifier({
+		align: [1, 1],
+		origin: [1, 1],
+		transform: Transform.translate(this.dimensions[0]-120, this.dimensions[1]-20, 0)
+	});
+
+	this.add(this.newUserButtonModifier).add(this.newUserButtonSurface);
+
+
 }
 
 function _addListeners() {
 	var self = this;
 
 	/*
-	* In the case of a sign up rather than a login
+	* When the user clicks on the create an account link
 	*/
-	this.signUpButtonSurface.on('click', function() {
-		var email = this.usernameInputSurface.getValue();
-		var password = this.passwordInputSurface.getValue();
-		var verification = this.verificationSurface.getValue();
-
-		console.log('clicked sign up');
-		if (password !== verification) {
-			//Notify user that the password and verifier do not match
+	this.newUserButtonSurface.on('click', function() {
+		if (this.newUserButtonSurface.getContent() === 'create an account') {
+			this.newUserButtonSurface.setContent('have an account');
+			this.loginButtonSurface.setContent('sign up');
+			this.verificationSurface.setProperties({visibility: 'visible'});
 		}
 		else {
-			Accounts.createUser({email: email, password:password}, function(error) {
-				if (error) {
-					//Inform the user that account creation failed
-					console.log('error');
-				}
-				else {
-					//Success! Account has been created and the suer has logged in successfully
-					//Fire the show everything event here
-					console.log('account created');
-					//Proceed to show the main tutorial app view
-					self._eventOutput.emit('createdAnAccount');
-				}
-			});
+			this.newUserButtonSurface.setContent('create an account');
+			this.loginButtonSurface.setContent('login');
+			this.verificationSurface.setProperties({visibility: 'hidden'});	
 		}
+		
 	}.bind(this));
 
 	/*
-	* Logging into an existing 
+	* Logging into the application
 	*/
 	this.loginButtonSurface.on('click', function() {
 		var email = this.usernameInputSurface.getValue();
 		var password = this.passwordInputSurface.getValue();
 
-		Meteor.loginWithPassword(email, password, function(error) {
-			if (error) {
-				//Do something
+		if (this.loginButtonSurface.getContent() === 'sign up') {
+			var verification = this.verificationSurface.getValue();
+
+			if (password !== verification) {
+				//Notify user that the password and verifier do not match
 			}
 			else {
-				//They logged in, fire the show everything event
-				self._eventOutput.emit('loggedInAnAccount');
+				Accounts.createUser({email: email, password:password}, function(error) {
+					if (error) {
+						//Inform the user that account creation failed
+						console.log('error');
+					}
+					else {
+						//Success! Account has been created and the suer has logged in successfully
+						//Fire the show everything event here
+						console.log('account created');
+						//Proceed to show the main tutorial app view
+						self._eventOutput.emit('createdAnAccount');
+					}
+				});
 			}
-		});
+		}
+		else {
+			console.log('login');
+			Meteor.loginWithPassword(email, password, function(error) {
+				if (error) {
+					//Do something
+				}
+				else {
+					//They logged in, fire the show everything event
+					self._eventOutput.emit('loggedInAnAccount');
+				}
+			});	
+		}
+
 	}.bind(this));
 }
 
@@ -211,6 +283,6 @@ LoginView.prototype.constructor = LoginView;
 
 LoginView.DEFAULT_OPTIONS = {
 	inputSurfaceWidth: 250,
-	inputSurfaceHeight: 20,
+	inputSurfaceHeight: 40,
 	loginButtonsWidth: 90
 };

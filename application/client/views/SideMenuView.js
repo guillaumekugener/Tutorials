@@ -40,14 +40,14 @@ function _createBackground() {
 */
 function _createMenuContent() {
 	//Will make this into a view once accounts is set up
-	var accountInfoSurface = new Surface({
-		content: '[account name will go here]',
+	this.accountInfoSurface = new Surface({
+		content: '',
 		size: [undefined, 100]
 	});
 
-	accountInfoSurface.addClass('sideMenuOption');
+	this.accountInfoSurface.addClass('sideMenuOption');
 
-	this.add(accountInfoSurface);
+	this.add(this.accountInfoSurface);
 
 	this.homeButtonSurface = new Surface({
 		content: 'Home',
@@ -72,5 +72,13 @@ function _addListeners() {
 
 SideMenuView.prototype = Object.create(View.prototype);
 SideMenuView.prototype.constructor = SideMenuView;
+
+/*
+* Set the current users name
+*/
+SideMenuView.prototype.setAccountName = function(name) {
+	this.accountInfoSurface.setContent(name);
+}
+
 
 SideMenuView.DEFAULT_OPTIONS = {};

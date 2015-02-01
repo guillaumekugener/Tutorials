@@ -62,6 +62,13 @@ function _createBodyViews() {
 	this.bodyFlexibleLayoutViews.push(this.allItemsScrollview);
 
 	this.allItemsScrollview.setPlaceholder('search for an item in the database');
+	this.allItemsScrollview.addRightSideIcon('img/plus.png');
+	this.allItemsScrollview.changeProperties({
+		headerSize: 50,
+		searchBarProperties: {
+			fontSize: '1em'
+		}
+	});
 
 	var middleGap = new View();
 	this.bodyFlexibleLayoutViews.push(middleGap);
@@ -83,8 +90,6 @@ function _createBodyViews() {
 	this.formPopUpModifier.setVisible(false);
 
 	this.add(this.formPopUpModifier).add(this.formPopUp);
-
-	this.allItemsScrollview.addRightSideIcon('img/plus.png');
 }
 
 /*
@@ -160,7 +165,7 @@ AddItemsInTutorialView.prototype.addItemToUsersList = function(itemName) {
 */
 AddItemsInTutorialView.prototype.addSelectedItemsToTutorial = function() {
 	//Make sure that 'item' is the name of the item and not the surface (currently, the surface)
-	Meteor.call('addItemsToTutorial', this.usersSetOfItems, this.tutorialName, function(error, result) {} );
+	//Meteor.call('addItemsToTutorial', this.usersSetOfItems, this.tutorialName, function(error, result) {} );
 }
 
 /*

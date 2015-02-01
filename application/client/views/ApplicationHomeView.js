@@ -31,10 +31,10 @@ function _addTutorialApplication() {
 function _addLoginView() {
 	this.overallLoginView = new View();
 
-	this.loginView = new LoginView();
+	this.loginView = new LoginView([this.options.loginScreenWidth, this.options.loginScreenHeight]);
 
 	this.loginViewModifier = new StateModifier({
-		size: [300, 250],
+		size: [this.options.loginScreenWidth, this.options.loginScreenHeight],
 		align: [0.5, 0.5],
 		origin: [0.5, 0.5]
 	});
@@ -52,6 +52,7 @@ function _addListeners() {
 
 	this.loginView.on('loggedInAnAccount', function() {
 		this.applicationLightbox.show(this.tutorialApplication);
+		this.tutorialApplication.setAccountName(Meteor.user().emails[0].address);
 	}.bind(this));
 }
 
@@ -59,6 +60,8 @@ ApplicationHomeView.prototype = Object.create(View.prototype);
 ApplicationHomeView.prototype.constructor = ApplicationHomeView;
 
 ApplicationHomeView.DEFAULT_OPTIONS = {
+	loginScreenWidth: 300,
+	loginScreenHeight: 280,
 	lightboxOpts: {
         // inTransform: Transform.translate(300, 0, 0),
         // outTransform: Transform.translate(300, 0, 0),

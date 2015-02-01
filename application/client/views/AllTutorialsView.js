@@ -30,8 +30,8 @@ function _createBackground() {
 	var backgroundSurface = new Surface({
 		size: [undefined, undefined],
 		properties: {
-			backgroundColor: '#4D505B',
-			border: '1px solid black'
+			backgroundColor: 'white',
+			// border: '1px solid black'
 		}
 	});
 
@@ -75,6 +75,9 @@ function _addListeners() {
 AllTutorialsView.prototype = Object.create(View.prototype);
 AllTutorialsView.prototype.constructor = AllTutorialsView;
 
+/*
+* Add a tutorial to the scrollview
+*/
 AllTutorialsView.prototype.addItemToList = function(self, doc) {
 	var itemSurface = new Surface({
 		size: [undefined, 100],
@@ -136,6 +139,26 @@ AllTutorialsView.prototype.getSelected = function() {
 
 AllTutorialsView.prototype.getSelectedSurface = function() {
 	return this.selectedSurface;
+}
+
+/*
+* Clears the scrollview of all surfaces
+*/
+AllTutorialsView.prototype.clearListOfElements = function() {
+	this.tutorialsToAdd = [];
+    this.tutorialsScrollview.sequenceFrom(tutorialsToAdd);
+}
+
+//Gets all the tutorials that match the users input on the SearchBarView in the database
+AllTutorialsView.prototype.getItemsMatchingSearch = function(userSearch) {
+	var self = this;
+	var criteria = userSearch;
+	this.clearListOfElements();
+	Meteor.call('getMatchingTutorials', criteria, function(error, result) {
+		for (var i = 0; i< result.length; i++) {
+			self.addItemToList(this, result[i]);
+		}
+	});
 }
 
 AllTutorialsView.DEFAULT_OPTIONS = {

@@ -16,10 +16,11 @@ StepCreationView = function () {
     _createBackground.call(this);
     _createLayout.call(this);
 
-    _addItemVerbListView.call(this);
+    //_addItemVerbListView.call(this);
     _addGapBetweenSections.call(this);
     _addCreationCenterView.call(this);
     _addLeftBufferWithMenu.call(this);
+    _addSearchableList.call(this);
 
     _createAndHidePopUp.call(this);
     _addListeners.call(this);
@@ -32,7 +33,8 @@ function _createBackground() {
 	var backgroundSurface = new Surface({
 		size: [undefined, undefined],
 		properties: {
-			backgroundColor: '#4D505B'
+			// backgroundColor: '#4D505B'
+			backgroundColor: 'white'
 		}
 	});
 
@@ -105,6 +107,23 @@ function _addItemVerbListView() {
 	views.unshift(this.itemVerbListView);
 }
 
+/*
+* Add the list on the right hand side of the screen that will allow users to add the items that they want
+*/
+function _addSearchableList() {
+	this.searchableList = new SearchableItemsListView();
+
+	this.searchableListModifier = new StateModifier({
+		transform: Transform.translate(-10, 10, 0)
+	});
+
+	var overallView = new View();
+
+	overallView.add(this.searchableListModifier).add(this.searchableList);
+
+	views.push(overallView);
+}
+
 function _createAndHidePopUp() {
 		this.formPopUp = new AddItemOrVerbFormView();
 		
@@ -120,32 +139,32 @@ function _createAndHidePopUp() {
 function _addListeners() {
 	var self = this;
 
-	this.itemVerbListView.on('showPopUpNouns', function() {
-		self.formPopUp.setType('nouns');
-		self.formPopUpModifier.setVisible(true);
-		self.formPopUp.additionalFieldsModifier.setVisible(true);
-	}.bind(this));
+	// this.itemVerbListView.on('showPopUpNouns', function() {
+	// 	self.formPopUp.setType('nouns');
+	// 	self.formPopUpModifier.setVisible(true);
+	// 	self.formPopUp.additionalFieldsModifier.setVisible(true);
+	// }.bind(this));
 
-	this.itemVerbListView.on('showPopUpVerbs', function() {
-		self.formPopUp.setType('verbs');
-		self.formPopUpModifier.setVisible(true);
-		self.formPopUp.additionalFieldsModifier.setVisible(false);
+	// this.itemVerbListView.on('showPopUpVerbs', function() {
+	// 	self.formPopUp.setType('verbs');
+	// 	self.formPopUpModifier.setVisible(true);
+	// 	self.formPopUp.additionalFieldsModifier.setVisible(false);
 
-	}.bind(this));
+	// }.bind(this));
 
-	this.itemVerbListView.on('selectedANoun', function() {
-		var selectedItem = this.itemVerbListView.itemListView.getSelected();
-		var surfaceToChange = this.selectedSurface;
+	// this.itemVerbListView.on('selectedANoun', function() {
+	// 	var selectedItem = this.itemVerbListView.itemListView.getSelected();
+	// 	var surfaceToChange = this.selectedSurface;
 
-		this.creationCenterView.setSurfaceContent(surfaceToChange, selectedItem);
-	}.bind(this));
+	// 	this.creationCenterView.setSurfaceContent(surfaceToChange, selectedItem);
+	// }.bind(this));
 
-	this.itemVerbListView.on('selectedAVerb', function() {
-		var selectedItem = this.itemVerbListView.verbsListView.getSelected();
-		var surfaceToChange = this.selectedSurface;
+	// this.itemVerbListView.on('selectedAVerb', function() {
+	// 	var selectedItem = this.itemVerbListView.verbsListView.getSelected();
+	// 	var surfaceToChange = this.selectedSurface;
 
-		this.creationCenterView.setSurfaceContent(surfaceToChange, selectedItem);		
-	}.bind(this));
+	// 	this.creationCenterView.setSurfaceContent(surfaceToChange, selectedItem);		
+	// }.bind(this));
 
 
 	this.creationCenterView.on('createAndAddStepToTutorial', function() {
@@ -169,16 +188,16 @@ function _addListeners() {
 
 	this.creationCenterView.on('clickedVerbSurface', function() {
 		this.selectedSurface = 'verb';
-		this.showAList('verbs');
+		//this.showAList('verbs');
 	}.bind(this));
 
 	this.creationCenterView.on('clickedLeftNounSurface', function() {
 		this.selectedSurface = 'leftNoun';
-		this.showAList('nouns');
+		//this.showAList('nouns');
 	}.bind(this));
 
 	this.creationCenterView.on('clickedRightNounSurface', function() {
-		this.showAList('nouns');
+		//this.showAList('nouns');
 		this.selectedSurface = 'rightNoun';
 	}.bind(this));
 

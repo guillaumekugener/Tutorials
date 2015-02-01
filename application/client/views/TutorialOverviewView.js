@@ -9,10 +9,17 @@ var SequentialLayout = require('famous/views/SequentialLayout');
 var Scrollview    = require('famous/views/Scrollview');
 var ImageSurface  = require('famous/surfaces/ImageSurface');
 
+/*
+* The view that appears to the right of the list of all of the tutorials in the tutorial list
+* that shows the basic info of the tutorials (title, number of steps, authors, items in the tutorial,
+* and images that are used in it)
+*/
+
 TutorialOverviewView = function () {
     View.apply(this, arguments);
 
-    this.allItemsInTutorial = [];
+    //this.allItemsInTutorial = [];
+    this.tutorialBeingViewed = undefined;
     this.sideToSideFlexLayoutViews =[];
     this.sequentialViews = [];
 
@@ -21,7 +28,7 @@ TutorialOverviewView = function () {
     _createBody.call(this);
     _addListeners.call(this);
 
-    this.itemsInTutorialList.sequenceFrom(this.allItemsInTutorial);
+    //this.itemsInTutorialList.sequenceFrom(this.allItemsInTutorial);
     this.mainSequentialLayoutInBody.sequenceFrom(this.sequentialViews);
     this.sideToSideFlexLayoutInBody.sequenceFrom(this.sideToSideFlexLayoutViews);
 }
@@ -50,7 +57,8 @@ function _createLayouts() {
 
 function _createHeader() {
 	this.tutorialTitleSurface = new Surface({
-		content: '<div>Tutorial Default Title</div><br><span id="authors">authors: John Doe</span>'
+		content: '<div>the tutorial title will apear here</div><br><span id="authors">authors will appear here</span>',
+		classes: ['titleHeader']
 	});
 
 	this.tutorialTitleSurface.addClass("tutorialOverview");
@@ -60,7 +68,8 @@ function _createHeader() {
 	});
 
 	this.tutorialStepsSurface = new Surface({
-		content: '<div>14 Steps</div>'
+		content: '<div>-- Steps</div>',
+		classes: ['titleHeader']
 	});
 
 	this.tutorialStepsSurface.addClass("tutorialOverviewSteps");
@@ -80,7 +89,9 @@ function _createBody() {
 	//////////////////////////////////////
 	//All items in the tutorial scrollview, that appears on the left hand side of the
 	//tutorial overview
-	this.itemsInTutorialList = new Scrollview();
+	this.itemsInTutorialList = new SearchableItemsListView();
+	this.itemsInTutorialList.lookThroughTutorial();
+	this.itemsInTutorialList.setPlaceholder('search for items in tutorial');
 
 	this.itemsInTutorialListModifier = new StateModifier({
 		size: [this.options.itemsListSize, undefined]
@@ -90,16 +101,16 @@ function _createBody() {
 	//Should be using a listView instead of a scrollview here... Should standardize that
 	//this.layout.content.add(this.itemsInTutorialListModifier).add(this.itemsInTutorialList);
 
-	var itemSurfaceExample = new Surface({
-		size: [undefined, 40],
-		content: "PSoC 5",
-		properties: {
-			backgroundColor: 'blue'
-		}
-	});
+	// var itemSurfaceExample = new Surface({
+	// 	size: [undefined, 40],
+	// 	content: "PSoC 5",
+	// 	properties: {
+	// 		backgroundColor: 'blue'
+	// 	}
+	// });
 
-	this.allItemsInTutorial.push(itemSurfaceExample);
-	itemSurfaceExample.pipe(this.itemsInTutorialList);
+	// this.allItemsInTutorial.push(itemSurfaceExample);
+	// itemSurfaceExample.pipe(this.itemsInTutorialList);
 	////////////////////////////
 
 
@@ -180,19 +191,42 @@ function _addListeners() {
 	this.viewFullTutorialButtonSurface.on('click', function() {
 		this._eventOutput.emit('continueToStepsView');
 	}.bind(this));
+
+	//When the user uses the search bar to look through all of the items in a tutorial, this event
+	//is fired for every key up (every time they type);
+	this.itemsInTutorialList.on('userSearchedForItemInTutorial', function() {
+		var self = this;
+		var criteria = this.itemsInTutorialList.getUsersSearchCriteria();
+		this.itemsInTutorialList.clearListOfElements();
+		
+		Meteor.call('getTutorialMatchingItems', this.tutorialBeingViewed, criteria, function(error, result) {
+			for (var i = 0; i< result.length; i++) {
+				self.itemsInTutorialList.addItemToFilteredList(result[i]);
+			}
+		});
+	}.bind(this));
 }
 
 
 TutorialOverviewView.prototype = Object.create(View.prototype);
 TutorialOverviewView.prototype.constructor = TutorialOverviewView;
 
+/*
+* Set the title information in the tutorial overview to be the information of the selected tutorial
+*/
 TutorialOverviewView.prototype.setTitleInformation = function(doc) {
-	var parsedAuthors = "John Doe, James Other";
+	this.tutorialBeingViewed = doc.title;
+
+	var parsedAuthors = doc.author;
 	var newContent = '<div>'+doc.title+'</div><br><span id="authors">authors: '+parsedAuthors+'</span>';
 
 	this.tutorialTitleSurface.setContent(newContent);
 
 	this.tutorialStepsSurface.setContent('<div>'+doc.numberOfSteps+' Steps</div>');
+
+	
+	this.itemsInTutorialList.clearListOfElements();
+	this.itemsInTutorialList.setPlaceholder('search for items in tutorial');
 }
 
 

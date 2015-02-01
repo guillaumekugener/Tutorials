@@ -15,7 +15,10 @@ SearchBarView = function () {
 function _createSearchSurfaces() {
 	this.searchBarSurface = new InputSurface({
 		size: [undefined, 25],
+		classes: ['searchBar']
 	});
+
+	this.searchBarSurface.setProperties({borderRadius: '12.5px'});
 
 	this.add(this.searchBarSurface);
 }
@@ -49,5 +52,26 @@ SearchBarView.prototype.setPlaceholder = function(placeholder) {
 	this.searchBarSurface.setPlaceholder(placeholder);
 }
 
+/*
+* Sets the style properties of the search bar
+*/
+SearchBarView.prototype.changeProperties = function(properties) {
+	var propertiesToSet = {};
+
+	if (properties.fontSize) {
+		propertiesToSet.fontSize = properties.fontSize;
+	}
+
+	if (properties.height) {
+		this.searchBarSurface.setSize([undefined, properties.height])
+	}
+
+	if (properties.borderRadius) {
+		propertiesToSet.borderRadius = properties.borderRadius;
+	}
+
+	console.log(propertiesToSet);
+	this.searchBarSurface.setProperties(propertiesToSet);
+}
 
 SearchBarView.DEFAULT_OPTIONS = {};

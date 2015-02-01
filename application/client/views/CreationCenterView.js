@@ -107,11 +107,10 @@ function _addImageDropArea() {
 	var gap= new View();
 
 	this.dropSurface = new Surface({
-		content: "<div id=\"dropbox\"><span id=\"droplabel\">Drop file here...</span></div><img id=\"preview\" alt=\"[preview will display here]\" class=\"dropArea\" />",
-		properties: {
-			backgroundColor: 'orange'
-		}
+		content: "<div id=\"dropbox\"><span id=\"droplabel\">Drop file here...</span></div><img id=\"preview\" alt=\"[preview will display here]\" class=\"dropArea\" />"
 	});
+
+	this.dropSurface.addClass('dropbox');
 
 	this.viewsInCreationView.push(gap);
 	this.viewsInCreationView.push(this.dropSurface);
@@ -210,14 +209,14 @@ function _addDeleteAndCreateButtons() {
 	buttons.push(gapBetweenButtons);
 
 	this.createStepSurface = new Surface({
-		//size: [undefined, 40],
-		content: 'Create Step',
-		properties: {
-			backgroundColor: '#77BA9B',
-			textAlign: 'center',
-			borderRadius: '10px',
-			paddingTop: '10px'
-		}
+		// //size: [undefined, 40],
+		// content: 'Create Step',
+		// properties: {
+		// 	backgroundColor: '#77BA9B',
+		// 	textAlign: 'center',
+		// 	borderRadius: '10px',
+		// 	paddingTop: '10px'
+		// }
 	});
 
 	buttons.push(this.createStepSurface);
@@ -228,17 +227,17 @@ function _addDeleteAndCreateButtons() {
 	var gap = new View();
 	this.viewsInCreationView.push(gap);
 
-	this.createStepSurface.on('click', function() {
-		this._eventOutput.emit('createAndAddStepToTutorial');
-	}.bind(this));
+	// this.createStepSurface.on('click', function() {
+	// 	this._eventOutput.emit('createAndAddStepToTutorial');
+	// }.bind(this));
 
-	this.createStepSurface.on('mouseover', function() {
-		this.createStepSurface.setProperties({'opacity': 0.5});
-	}.bind(this));
+	// this.createStepSurface.on('mouseover', function() {
+	// 	this.createStepSurface.setProperties({'opacity': 0.5});
+	// }.bind(this));
 
-	this.createStepSurface.on('mouseleave', function() {
-		this.createStepSurface.setProperties({'opacity': 1});
-	}.bind(this));	
+	// this.createStepSurface.on('mouseleave', function() {
+	// 	this.createStepSurface.setProperties({'opacity': 1});
+	// }.bind(this));	
 }
 
 function _addListeners() {

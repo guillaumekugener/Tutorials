@@ -1,5 +1,14 @@
 Tutorials = new Mongo.Collection('tutorials');
 
+/*
+* TODO: 
+* - Fix the 'Put an item here...' to checking if the item is null. In case we want to change the wording, checking
+*   for what is says would throw everything off.
+* - Error checking for all of the functions
+*
+*/
+
+
 Meteor.methods({
 
 	/*
@@ -31,6 +40,10 @@ Meteor.methods({
 			throw new Meteor.Error("undefined-field", "All fields must be defined!");
 		}
 
+		//Get the email address of the current user
+		var author = Meteor.user().emails[0].address;
+		doc.author = author;
+
 		return Tutorials.insert(doc);
 	},
 	/*
@@ -40,14 +53,41 @@ Meteor.methods({
 	*	verb -> the verb that appears in the verb slot of the SentenceView
 	*	description -> a description of the task
 	*	img -> the id or data for the image that appears on this step
+	* We also need to look at the items that the user has entred and update the items stored in the
+	* tutorial
 	*/
 	addOrModifyStep: function(doc) {
 		var tutorialInfo = Tutorials.findOne({name: doc.name});
 		var previousSteps = tutorialInfo.steps;
 
-		//This needs to be fixed!! Adding some elements twice
-		// if (typeof doc.stepNumber === 'number' && doc.stepNumber < previousSteps.length) {
+		var items = tutorialInfo.items;
+		console.log('the items are...');
+		console.log(items);
+
+		//If the user is not creating a new step, but modifying a step that was already included
+		//then we need to edit this step's information
 		if (previousSteps[doc.stepNumber-1] !== undefined) {
+			//Remove the items that were in this step (reduce their count by one in the items dictionary)
+			var prevItem1 = previousSteps[doc.stepNumber-1].item1;
+			var prevItem2 = previousSteps[doc.stepNumber-1].item2;
+			console.log('prevItem1 ' + prevItem1);
+			console.log('prevItem2 ' + prevItem2);
+
+			if (prevItem1 !== 'Put an item here...') {
+				items[prevItem1] -= 1;
+			}
+			if (prevItem2 !== 'Put an item here...') {
+				items[prevItem2] -= 1;
+			}
+
+			if (items[prevItem1] == 0) {
+				delete items[prevItem1];
+			}
+
+			if (items[prevItem2] == 0) {
+				delete items[prevItem2];
+			}
+
 			previousSteps[doc.stepNumber-1] = {
 				item1: doc.item1, 
 				item2: doc.item2, 
@@ -56,6 +96,7 @@ Meteor.methods({
 				img: ''
 			};
 		}
+		//In the case where the user is adding a step to the tutorial (at the end)
 		else {
 			previousSteps.push({
 				item1: doc.item1, 
@@ -65,7 +106,24 @@ Meteor.methods({
 				img: ''
 			});
 		}
-		var newInfo = {name: doc.name, steps: previousSteps}
+
+		if (doc.item1 !== 'Put an item here...') {
+			//Add the items to items set for the tutorial
+			if (!items[doc.item1]) {
+				items[doc.item1] = 0;
+			};
+			items[doc.item1] += 1;
+		}
+
+		if (doc.item2 !== 'Put an item here...') {
+			//Add the items to items set for the tutorial
+			if (!items[doc.item2]) {
+				items[doc.item2] = 0;
+			};
+			items[doc.item2] += 1;
+		}
+
+		var newInfo = {name: doc.name, steps: previousSteps, items: items}
 
 		Tutorials.update({name: doc.name}, newInfo);
 	},
@@ -113,5 +171,33 @@ Meteor.methods({
 		tutorialInfo.items = allItems;
 
 		Tutorials.update({name: tutorialName}, tutorialInfo);
+	},
+	/*
+	* Given a tutorial name and a search critera, returns all of the items that fit the search criteria 
+	* (currently it is s typed search rather than a properties search)
+	*/
+	getTutorialMatchingItems: function(tutorialName, criteria) {
+		var search = new RegExp(criteria, 'i');
+
+		var tutorialInfo = Tutorials.findOne({name: tutorialName});
+		var tutorialItems = tutorialInfo.items;
+		var found = [];
+		for (var key in tutorialItems) {
+			if (key.match(search) !== null && tutorialItems[key] > 0) {
+				found.push(key);
+			}
+		}
+
+		return found;
+	},
+	/*
+	* Given a regex expression, return all of the tutorials whose names satisfy the regex
+	* Will include search for authors and other similar things in the future
+	*/
+	getMatchingTutorials: function(criteria) {
+		var search = new RegExp(criteria, 'i');
+
+		var found = Tutorials.find({name: search}).fetch();
+		return found;
 	}
 });

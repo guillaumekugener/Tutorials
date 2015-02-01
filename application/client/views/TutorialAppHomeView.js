@@ -94,9 +94,7 @@ function _createHeader() {
 	//Add a white background to the header view, so that we can not see any views behind it
 	var headerBackgroundSurface = new Surface({
 		size: [undefined, undefined],
-		properties: {
-			backgroundColor: '#293E6A'
-		}
+		classes: ['navbarStyling']
 	});
 
 	this.layout.header.add(headerBackgroundSurface)
@@ -142,12 +140,7 @@ function _createHeader() {
 	var addIconSurface = new Surface({
 		size: [undefined, 30],
 		content: 'Create new tutorial',
-		properties: {
-			backgroundColor: '#77BA9B',
-			color: 'white',
-			textAlign: 'center',
-			borderRadius: '7px'
-		}
+		classes: ['navBarCreationButton']
 	});
 
 	var addIconModifier = new StateModifier({
@@ -183,10 +176,7 @@ function _createTutorialSelectedHeader() {
 
 	var headerBackgroundSurface = new Surface({
 		size: [undefined, undefined],
-		properties: {
-			backgroundColor: '#293E6A',
-			color: 'white'
-		}
+		classes: ['navbarStyling']
 	});
 
 	this.tutorialSelectedHeaderView.add(headerBackgroundSurface);
@@ -246,7 +236,7 @@ function _createTutorialSelectedHeader() {
 		size: [undefined, 25],
 		content: '<< Previous Step',
 		properties: {
-			backgroundColor: '#B6A754',
+			backgroundColor: '#F8C408',
 			textAlign: 'center',
 			color: 'white',
 			borderRadius: '10px'			
@@ -256,23 +246,6 @@ function _createTutorialSelectedHeader() {
 	var self = this;
 
 	this.previousStepView.surface.on('click', function() {
-		// var stepNumber = this.stepsListView.getSelected();
-		// if (stepNumber !== 'new') {
-		// 	if (stepNumber > 0) {
-		// 		var tutorialName = this.alltutorialsScrollView.selected;
-		// 		this.centered = true;
-		// 		var goToStep = stepNumber - 1;
-		// 		this.stepsListView.setSelectedStep(goToStep);
-		// 		Meteor.call('getTutorialSteps', tutorialName, function(error, result) {
-		// 			var stepOfInterestInfo = result[stepNumber];
-		// 			self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
-		// 			self.showStepCreationView();
-		// 			self.slideMainViewBackToCenter();
-		// 			self.stepCreationView.setTitle('Step ' + goToStep, tutorialName);
-		// 		});
-		// 	}
-		// }
-
 		var currentStep = this.stepCreationView.getCurrentStep();
 		this.stepCreationView.saveStepInformation();
 		//Modify the current step (save the info)
@@ -308,7 +281,7 @@ function _createTutorialSelectedHeader() {
 		size: [undefined, 25],
 		content: 'Next step >>',
 		properties: {
-			backgroundColor: '#77BA9B',
+			backgroundColor: '#F8C408',
 			textAlign: 'center',
 			color: 'white',
 			borderRadius: '10px'
@@ -316,25 +289,6 @@ function _createTutorialSelectedHeader() {
 	});
 
 	this.nextStepView.surface.on('click', function() {
-		// var stepNumber = this.stepsListView.getSelected();
-		// if (stepNumber !== 'new') {
-		// 	var goToStep = stepNumber + 1;
-		// 	var tutorialName = this.alltutorialsScrollView.selected;
-		// 	this.centered = true;
-		// 	var numOfSteps = 0;
-		// 	Meteor.call('getTutorialSteps', tutorialName, function(error, result) {
-		// 		var stepOfInterestInfo = result[stepNumber];
-		// 		numOfSteps = result.length;
-		// 		if (numOfSteps > goToStep) {
-		// 			self.stepsListView.setSelectedStep(goToStep);
-		// 			self.stepCreationView.populateWithStepInfo(stepOfInterestInfo);
-		// 			self.showStepCreationView();
-		// 			self.slideMainViewBackToCenter();
-		// 			self.stepCreationView.setTitle('Step ' + goToStep, tutorialName);
-		// 		}
-		// 	});
-		// }
-
 		/*
 		* The button should do one of two things:
 		*	1. Move to the next step of the tutorial (obviously)
@@ -492,6 +446,13 @@ function _addListeners() {
 		//this.slideMenuUpIntoView();
 		this.showStepCreationView();
 		this.stepCreationView.setToStep1();
+	}.bind(this));
+
+	//Add the listener on the search bar at the top of the view with all of the tutorials
+	//as it should filter which tutorials are in the view based on the criteria
+	this.headerSearchBarView.on('userSearched', function() {
+		var criteria = this.headerSearchBarView.getContent();
+		this.alltutorialsScrollView.getMatchingTutorials(criteria);
 	}.bind(this));
 }
 
@@ -683,6 +644,10 @@ TutorialAppHomeView.prototype.hideMenuDownBelowScreen = function() {
 		duration: 300,
 		curve: 'easeOut'
 	});
+}
+
+TutorialAppHomeView.prototype.setAccountName = function(name) {
+	this.navigationMenu.setAccountName(name);
 }
 
 /*

@@ -13,10 +13,12 @@ var ImageSurface  = require('famous/surfaces/ImageSurface');
 SearchableItemsListView = function () {
     View.apply(this, arguments);
 
+    this.itemsInTutorial = false;
     this.filteredItems = [];
 
     this.selected = undefined;
 
+    _createListBackgroundSurface.call(this);
     _createTopOfList.call(this);
     _createScrollviewOfList.call(this);
     _addListener.call(this);
@@ -25,14 +27,28 @@ SearchableItemsListView = function () {
 }
 
 /*
+* Creates the background of the SearchableList
+*/
+function _createListBackgroundSurface() {
+	var backgroundSurface = new Surface({
+		size: [undefined, undefined],
+		classes: ['backgroundSurface']
+	});
+
+	var backgroundModifier = new StateModifier({
+		transform: Transform.translate(0, 0, -5)
+	});
+
+	this.add(backgroundModifier).add(backgroundSurface);
+}
+
+/*
 * Create the top search bar area of the searchable list
 */
 function _createTopOfList() {
-	var topBackroundSurface = new Surface({
+	this.topBackgroundSurface = new Surface({
 		size: [undefined, this.options.topHeaderSize],
-		properties: {
-			backgroundColor: 'blue'
-		}
+		classes: ['topOfListHeader']
 	});
 
 	var headerViews = [];
@@ -56,12 +72,12 @@ function _createTopOfList() {
 		transform: Transform.translate(0, 5, 1)
 	});
 
-	this.add(topBackroundSurface);
+	this.add(this.topBackgroundSurface);
 	this.add(searchBarViewModifier).add(headerFlexLayout);
 
-	topBackroundSurface.on('click', function() {
-		this.getItemsMatchingSearch();
-	}.bind(this));
+	// topBackgroundSurface.on('click', function() {
+	// 	this.getItemsMatchingSearch();
+	// }.bind(this));
 }
 
 /*
@@ -70,14 +86,14 @@ function _createTopOfList() {
 function _createScrollviewOfList() {
 	this.filteredItemsScrollview = new Scrollview();
 
-	var filteredItemsScrollviewModifier = new StateModifier({
+	this.filteredItemsScrollviewModifier = new StateModifier({
 		transform: Transform.translate(0, this.options.topHeaderSize, 0)
 	});
 
-	this.add(filteredItemsScrollviewModifier).add(this.filteredItemsScrollview);
+	this.add(this.filteredItemsScrollviewModifier).add(this.filteredItemsScrollview);
 
 	var bufferTopSurface = new Surface({
-		size: [undefined, 35]
+		size: [undefined, this.options.topHeaderSize]
 	});
 
 	//Might have to do it this way because translating items will move them off screen, so some
@@ -88,14 +104,25 @@ function _createScrollviewOfList() {
 
 function _addListener() {
 	this.searchBarView.on('userSearched', function() {
-		this.getItemsMatchingSearch();
+		if (!this.itemsInTutorial) {
+			this.getItemsMatchingSearch();		
+		}
+		this._eventOutput.emit('userSearchedForItemInTutorial');
+
 	}.bind(this));
 }
 
 SearchableItemsListView.prototype = Object.create(View.prototype);
 SearchableItemsListView.prototype.constructor = SearchableItemsListView;
 
-//Gets all the items that match the users input on the SearchBarView
+/*
+* Get the content that the user entered in the search bar
+*/
+SearchableItemsListView.prototype.getUsersSearchCriteria = function() {
+	return this.searchBarView.getContent();
+}
+
+//Gets all the items that match the users input on the SearchBarView in the database
 SearchableItemsListView.prototype.getItemsMatchingSearch = function() {
 	var self = this;
 	var criteria = this.searchBarView.getContent();
@@ -111,12 +138,8 @@ SearchableItemsListView.prototype.getItemsMatchingSearch = function() {
 SearchableItemsListView.prototype.addItemToFilteredList = function(itemName) {
 	var itemSurface = new Surface({
 		content: itemName,
-		size: [undefined, 50],
-		properties: {
-			textAlign: 'center',
-			backgroundColor: 'cyan',
-			color: 'white'
-		}
+		size: [undefined, 80],
+		classes: ['listElement']
 	});
 
 	itemSurface.name = itemName;
@@ -160,17 +183,47 @@ SearchableItemsListView.prototype.addRightSideIcon = function(givenSource) {
 		content: givenSource
 	});
 
-	var rightSideIconModifier = new StateModifier({
+	this.rightSideIconModifier = new StateModifier({
 		size: [undefined, this.options.topHeaderSize],
 		align: [0.5, 0],
 		origin: [0.5, 0]
 	});
 
-	this.rightGap.add(rightSideIconModifier).add(this.rightSideIcon);
+	this.rightGap.add(this.rightSideIconModifier).add(this.rightSideIcon);
 
 	this.rightSideIcon.on('click', function() {
 		this._eventOutput.emit('searchableListRightSideIconClicked');
 	}.bind(this));
+}
+
+/*
+* Set to this list so that the search bar looks through items in this tutorial, not through the whole
+* database
+*/
+SearchableItemsListView.prototype.lookThroughTutorial = function() {
+	this.itemsInTutorial = true;
+}
+
+/*
+* Given a properties objects with requirements, it sets the properties of the SearchableListView to the ones
+* given (for example, font-size in the search bar, the size of the header, etc)
+*/
+SearchableItemsListView.prototype.changeProperties = function(properties) {
+	console.log(properties);
+	if (properties.headerSize) {
+		this.topBackgroundSurface.setSize([undefined, properties.headerSize]);
+		this.filteredItemsScrollviewModifier.setTransform((0, properties.headerSize, -1));
+		if (this.rightSideIconModifier) {
+			this.rightSideIconModifier.setSize([undefined, properties.headerSize]);
+		}
+	}
+
+	if (properties.searchBarProperties) {
+		var headerSize = properties.headerSize;
+		properties.searchBarProperties['borderRadius'] = (1.0 * (headerSize-10)/2) + 'px';
+		properties.searchBarProperties['height'] = headerSize - 10;
+		this.searchBarView.changeProperties(properties.searchBarProperties);
+	}
 }
 
 SearchableItemsListView.DEFAULT_OPTIONS = {
