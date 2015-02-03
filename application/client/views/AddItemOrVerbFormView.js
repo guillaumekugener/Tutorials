@@ -8,6 +8,8 @@ var InputSurface  = require('famous/surfaces/InputSurface');
 AddItemOrVerbFormView = function () {
     View.apply(this, arguments);
 
+    this.justEntered = undefined;
+
     _addBackground.call(this);
     _createForm.call(this);
     _addPortField.call(this);
@@ -120,7 +122,15 @@ function _createForm() {
 		if (self.type === 'nouns') {
 			var verbsUnSplit = self.addPortFieldSurface.getValue();
 			var verbsArray = verbsUnSplit.split(", ");
-			Meteor.call('newItem', {name: newItemName, verbs: verbsArray}, function(error, result) {
+			var verbsSet = {};
+
+			for (var i=0; i < verbsArray.length; i++) {
+				if (verbsArray[i] !== "") {
+					verbsSet[verbsArray[i]] = true;
+				}
+			}
+
+			Meteor.call('newItem', {name: newItemName, verbs: verbsSet}, function(error, result) {
 			});			
 
 			for (var i = 0; i < verbsArray.length; i++) {
@@ -131,11 +141,12 @@ function _createForm() {
 		}
 
 		else {
+
 			Meteor.call('newVerb', {name: newItemName}, function(error, result) {
 
 			});
 		}
-
+		this.justEntered = newItemName;
 		self._eventOutput.emit('hideForm');
 
 	}.bind(this));
@@ -193,6 +204,13 @@ AddItemOrVerbFormView.prototype.constructor = AddItemOrVerbFormView;
 
 AddItemOrVerbFormView.prototype.setType = function(type) {
 	this.type = type;
+}
+
+/*
+* Returns the name of the previously entered object
+*/
+AddItemOrVerbFormView.prototype.justEnteredText = function() {
+	return this.justEntered;
 }
 
 AddItemOrVerbFormView.DEFAULT_OPTIONS = {};

@@ -97,7 +97,11 @@ function _createHeader() {
 		classes: ['navbarStyling']
 	});
 
-	this.layout.header.add(headerBackgroundSurface)
+	var headerBackgroundModifier = new StateModifier({
+		transform: Transform.translate(0, 0, 5)
+	});
+
+	this.layout.header.add(headerBackgroundModifier).add(headerBackgroundSurface);
 
 	//Create a flexible layout. This is what I have been using in order to handle for scaling of
 	//views when the window is squished or enlarged. Works very well
@@ -107,7 +111,7 @@ function _createHeader() {
 
 	this.flexibleHeaderModifier = new StateModifier({
 		size: [undefined, this.options.headerSize],
-		transform: Transform.translate(0, 5, 0)
+		transform: Transform.translate(0, 5, 10)
 	});
 
 	this.headerView.add(this.flexibleHeaderModifier).add(this.flexibleHeader);
@@ -187,7 +191,7 @@ function _createTutorialSelectedHeader() {
 
 	this.flexibleTutorialSelectedHeaderViewModifier = new StateModifier({
 		size: [undefined, this.options.headerSize],
-		transform: Transform.translate(0, 5, 1)
+		transform: Transform.translate(0, 5, 10)
 	});
 
 	this.tutorialSelectedHeaderView.add(this.flexibleTutorialSelectedHeaderViewModifier).add(this.flexibleTutorialSelectedHeaderView);

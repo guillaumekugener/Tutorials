@@ -61,8 +61,7 @@ Meteor.methods({
 		var previousSteps = tutorialInfo.steps;
 
 		var items = tutorialInfo.items;
-		console.log('the items are...');
-		console.log(items);
+		var verbs = tutorialInfo.verbs;
 
 		//If the user is not creating a new step, but modifying a step that was already included
 		//then we need to edit this step's information
@@ -70,8 +69,7 @@ Meteor.methods({
 			//Remove the items that were in this step (reduce their count by one in the items dictionary)
 			var prevItem1 = previousSteps[doc.stepNumber-1].item1;
 			var prevItem2 = previousSteps[doc.stepNumber-1].item2;
-			console.log('prevItem1 ' + prevItem1);
-			console.log('prevItem2 ' + prevItem2);
+			var prevVerb = previousSteps[doc.stepNumber-1].verb;
 
 			if (prevItem1 !== 'Put an item here...') {
 				items[prevItem1] -= 1;
@@ -80,12 +78,20 @@ Meteor.methods({
 				items[prevItem2] -= 1;
 			}
 
+			if (prevVerb !== 'Put the verb here...') {
+				verbs[prevVerb] -= 1;
+			}
+
 			if (items[prevItem1] == 0) {
 				delete items[prevItem1];
 			}
 
 			if (items[prevItem2] == 0) {
 				delete items[prevItem2];
+			}
+
+			if (verbs[prevVerb] == 0) {
+				delete verbs[prevVerb];
 			}
 
 			previousSteps[doc.stepNumber-1] = {
@@ -123,7 +129,15 @@ Meteor.methods({
 			items[doc.item2] += 1;
 		}
 
-		var newInfo = {name: doc.name, steps: previousSteps, items: items}
+		if (doc.verb !== 'Put the verb here...') {
+			//Add the verb to the verbs set for the tutorial
+			if (!verbs[doc.verb]) {
+				verbs[doc.verb] = 0;
+			}
+			verbs[doc.verb] += 1;
+		}
+
+		var newInfo = {name: doc.name, steps: previousSteps, items: items, verbs: verbs}
 
 		Tutorials.update({name: doc.name}, newInfo);
 	},
@@ -174,7 +188,7 @@ Meteor.methods({
 	},
 	/*
 	* Given a tutorial name and a search critera, returns all of the items that fit the search criteria 
-	* (currently it is s typed search rather than a properties search)
+	* (currently it is a typed search rather than a properties search)
 	*/
 	getTutorialMatchingItems: function(tutorialName, criteria) {
 		var search = new RegExp(criteria, 'i');

@@ -182,10 +182,10 @@ SentenceView.prototype.getSelectedSurface = function() {
 }
 
 SentenceView.prototype.setSurfaceContent = function(surfaceName, content) {
-	if (surfaceName === 'leftNoun') {
+	if (surfaceName === 'leftNounSurface') {
 		this.leftNounSurface.setContent(content);
 	}
-	else if (surfaceName === 'rightNoun') {
+	else if (surfaceName === 'rightNounSurface') {
 		this.rightNounSurface.setContent(content)
 	}
 	else {

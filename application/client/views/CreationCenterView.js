@@ -46,7 +46,7 @@ function _addTitleSurface() {
 		properties: {
 			textAlign: 'left',
 			fontSize: '200%',
-			color: 'white'
+			color: 'black'
 		}
 	});
 
@@ -242,15 +242,17 @@ function _addDeleteAndCreateButtons() {
 
 function _addListeners() {
 	this.sentenceView.on('clickedOnVerbSurface', function() {
-		this._eventOutput.emit('clickedVerbSurface')
+		this._eventOutput.emit('clickedAVerb');
 	}.bind(this));
 
 	this.sentenceView.on('clickedOnLeftNounSurface', function() {
 		this._eventOutput.emit('clickedLeftNounSurface');
+		this._eventOutput.emit('clickedANoun');
 	}.bind(this));
 
 	this.sentenceView.on('clickedOnRightNounSurface', function() {
 		this._eventOutput.emit('clickedRightNounSurface');
+		this._eventOutput.emit('clickedANoun');
 	}.bind(this));
 }
 
@@ -288,6 +290,24 @@ CreationCenterView.prototype.getSentenceViewSurfaceSelected = function() {
 
 CreationCenterView.prototype.setSurfaceContent = function(surfaceName, content) {
 	this.sentenceView.setSurfaceContent(surfaceName, content);
+}
+
+/*
+* Returns the content from the current elements in the sentence view in an object
+*/
+CreationCenterView.prototype.getSentenceContent = function() {
+
+	var content = this.sentenceView.getSentenceContent();
+	if (content.leftNoun === 'Put an item here...') {
+		content.leftNoun = undefined;
+	}
+
+	if (content.rightNoun === 'Put an item here...') {
+		content.rightNoun = undefined;
+	}
+
+	return content;
+
 }
 
 CreationCenterView.prototype.getStepInformation = function() {

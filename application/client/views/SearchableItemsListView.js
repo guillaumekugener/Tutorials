@@ -18,7 +18,7 @@ SearchableItemsListView = function () {
 
     this.selected = undefined;
 
-    _createListBackgroundSurface.call(this);
+    //_createListBackgroundSurface.call(this);
     _createTopOfList.call(this);
     _createScrollviewOfList.call(this);
     _addListener.call(this);
@@ -39,7 +39,7 @@ function _createListBackgroundSurface() {
 		transform: Transform.translate(0, 0, -5)
 	});
 
-	this.add(backgroundModifier).add(backgroundSurface);
+	//this.add(backgroundModifier).add(backgroundSurface);
 }
 
 /*
@@ -53,7 +53,7 @@ function _createTopOfList() {
 
 	var headerViews = [];
 	var headerFlexLayout = new FlexibleLayout({
-		ratios: [1, 10, 1]
+		ratios: [10, 1]
 	});
 
 	this.leftGap = new View();
@@ -62,14 +62,14 @@ function _createTopOfList() {
 
 	headerFlexLayout.sequenceFrom(headerViews);
 
-	headerViews.push(this.leftGap);
+	//headerViews.push(this.leftGap);
 	headerViews.push(this.searchBarView);
 	headerViews.push(this.rightGap);
 
 	var searchBarViewModifier = new StateModifier({
 		// origin: [0.5, 0],
 		// align: [0.5, 0],
-		transform: Transform.translate(0, 5, 1)
+		transform: Transform.translate(5, 5, 1)
 	});
 
 	this.add(this.topBackgroundSurface);
@@ -224,6 +224,20 @@ SearchableItemsListView.prototype.changeProperties = function(properties) {
 		properties.searchBarProperties['height'] = headerSize - 10;
 		this.searchBarView.changeProperties(properties.searchBarProperties);
 	}
+}
+
+/*
+* Adds a buffer so that the scrollview can be split into different sections
+*/
+SearchableItemsListView.prototype.addSeparatorToList = function(separationName) {
+	var itemSurface = new Surface({
+		content: separationName,
+		size: [undefined, 40],
+		classes: ['separationElement']
+	});
+
+	this.filteredItems.push(itemSurface);
+	itemSurface.pipe(this.filteredItemsScrollview);	
 }
 
 SearchableItemsListView.DEFAULT_OPTIONS = {

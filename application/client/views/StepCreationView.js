@@ -12,6 +12,7 @@ StepCreationView = function () {
     View.apply(this, arguments);
 
     this.currentStep = undefined;
+    this.selectedSurface = undefined;
 
     _createBackground.call(this);
     _createLayout.call(this);
@@ -112,6 +113,9 @@ function _addItemVerbListView() {
 */
 function _addSearchableList() {
 	this.searchableList = new SearchableItemsListView();
+	this.searchableList.setPlaceholder('');
+	this.searchableList.addRightSideIcon('img/plus.png');
+
 
 	this.searchableListModifier = new StateModifier({
 		transform: Transform.translate(-10, 10, 0)
@@ -138,6 +142,83 @@ function _createAndHidePopUp() {
 
 function _addListeners() {
 	var self = this;
+
+	//Load the content in the searchable list on the right hand side of the screen
+	this.creationCenterView.on('clickedANoun', function() {
+		this.searchableList.clearListOfElements();
+		var tutorialName = this.creationCenterView.getTitle();
+		this.searchableList.setPlaceholder('search for an item');
+		Meteor.call('getTutorialMatchingItems', tutorialName, '', function(error, result) {
+			for (var i = 0; i< result.length; i++) {
+				self.searchableList.addItemToFilteredList(result[i]);
+			}
+		});
+	}.bind(this));
+
+	// this.creationCenterView.on('clickedLeftNounSurface', function() {
+
+	// }.bind(this));
+
+	// this.creationCenterView.on('clickedLeftNounSurface', function() {
+
+	// }.bind(this));
+
+	this.creationCenterView.on('clickedAVerb', function() {
+		this.selectedSurface = 'verb';
+		this.searchableList.clearListOfElements();
+		var tutorialName = this.creationCenterView.getTitle();
+		this.searchableList.setPlaceholder('search for an action verb');
+
+		var content = this.creationCenterView.getSentenceContent();
+
+		Meteor.call('retrieveVerbsFromNouns', content.leftNoun, content.rightNoun, function(error, result) {
+			console.log(result);
+			//Have to first add the common verbs to the top of the list
+			self.searchableList.addSeparatorToList('in common');
+			if (result) {
+				for (var key in result.common) {
+					self.searchableList.addItemToFilteredList(key);
+				}				
+			}
+
+			if (content.leftNoun) {
+				self.searchableList.addSeparatorToList(content.leftNoun);
+				for (var key in result[content.leftNoun]) {
+					self.searchableList.addItemToFilteredList(key);
+				}
+			}
+			if (content.rightNoun) {			
+				self.searchableList.addSeparatorToList(content.rightNoun);
+				for (var key in result[content.rightNoun]) {
+					self.searchableList.addItemToFilteredList(key);
+				}
+			}
+		});
+
+	}.bind(this));
+
+	this.searchableList.on('userWantsToAddItem', function() {
+		var selectedItem = this.searchableList.getAndReturnSelected();
+		var selectedSurface = this.creationCenterView.getSentenceViewSurfaceSelected();
+		this.creationCenterView.setSurfaceContent(selectedSurface, selectedItem.getContent());
+	}.bind(this));
+
+	this.searchableList.on('searchableListRightSideIconClicked', function() {
+		if (this.selectedSurface) {
+			console.log(this.selectedSurface);
+			if (this.selectedSurface === 'verb') {
+				this.formPopUp.setType('verbs');
+				this.formPopUpModifier.setVisible(true);
+				this.formPopUp.additionalFieldsModifier.setVisible(false);
+			}
+			//Should be a noun in this case
+			else {
+				this.formPopUp.setType('nouns');
+				this.formPopUpModifier.setVisible(true);
+				this.formPopUp.additionalFieldsModifier.setVisible(true);
+			}
+		}
+	}.bind(this));
 
 	// this.itemVerbListView.on('showPopUpNouns', function() {
 	// 	self.formPopUp.setType('nouns');
@@ -166,7 +247,7 @@ function _addListeners() {
 	// 	this.creationCenterView.setSurfaceContent(surfaceToChange, selectedItem);		
 	// }.bind(this));
 
-
+	//We want to make sure that we save all of the information correctly in the database
 	this.creationCenterView.on('createAndAddStepToTutorial', function() {
 		var sentenceInfo = this.creationCenterView.getStepInformation();
 
@@ -182,27 +263,38 @@ function _addListeners() {
 		};
 
 		Meteor.call('addOrModifyStep', stepInfoToStore, function(error, result) {});
+		Meteor.call('addVerbToNoun', sentenceInfo['leftNoun'], sentenceInfo['verb'], function(error, result) {});
+		Meteor.call('addVerbToNoun', sentenceInfo['rightNoun'], sentenceInfo['verb'], function(error, result) {});
 
 		this._eventOutput.emit('createdAndAddedStepToTutorial');
 	}.bind(this));
 
-	this.creationCenterView.on('clickedVerbSurface', function() {
-		this.selectedSurface = 'verb';
-		//this.showAList('verbs');
-	}.bind(this));
+	// this.creationCenterView.on('clickedVerbSurface', function() {
+	// 	//this.showAList('verbs');
+	// }.bind(this));
 
 	this.creationCenterView.on('clickedLeftNounSurface', function() {
 		this.selectedSurface = 'leftNoun';
-		//this.showAList('nouns');
 	}.bind(this));
 
 	this.creationCenterView.on('clickedRightNounSurface', function() {
-		//this.showAList('nouns');
 		this.selectedSurface = 'rightNoun';
 	}.bind(this));
 
+	//When the creation for gets closed, we want to add some items to the object surfaces
 	this.formPopUp.on('hideForm', function() {
 		self.formPopUpModifier.setVisible(false);
+		console.log(this.selectedSurface);
+		if (this.selectedSurface === 'verb') {
+			var sentenceInfo = this.creationCenterView.getStepInformation();
+			this.creationCenterView.setSurfaceContent('verbSurface', this.formPopUp.justEnteredText());
+			if (sentenceInfo['item1'] !== 'Put an item here') {
+				Meteor.call('addVerbToNoun', sentenceInfo['item'], sentenceInfo['verb'], function(error, result) {});
+			}
+			if (sentenceInfo['item2'] !== 'Put an item here') {
+				Meteor.call('addVerbToNoun', sentenceInfo['item2'], sentenceInfo['verb'], function(error, result) {});
+			}
+		}
 	}.bind(this));
 }
 
@@ -276,6 +368,8 @@ StepCreationView.prototype.saveStepInformation = function() {
 	stepInfo.stepNumber = this.getCurrentStep();
 
 	Meteor.call('addOrModifyStep', stepInfo, function(error, result) {} );
+	Meteor.call('addVerbToNoun', stepInfo['item1'], stepInfo['verb'], function(error, result) {});
+	Meteor.call('addVerbToNoun', stepInfo['item2'], stepInfo['verb'], function(error, result) {});
 }
 
 StepCreationView.DEFAULT_OPTIONS = {};
