@@ -23,6 +23,8 @@ var tutorialsInView = [];
 TutorialAppHomeView = function () {
     View.apply(this, arguments);
 
+    this.playback = false;
+
     _createBlankBackgroundScreen.call(this);
     _createLayout.call(this);
     _createLightbox.call(this);
@@ -250,13 +252,18 @@ function _createTutorialSelectedHeader() {
 	var self = this;
 
 	this.previousStepView.surface.on('click', function() {
-		var currentStep = this.stepCreationView.getCurrentStep();
-		this.stepCreationView.saveStepInformation();
-		//Modify the current step (save the info)
-		///
-		if (currentStep !== 1) {
-			var previousStep = currentStep - 1;
-			this.stepCreationView.setToStep(previousStep);	
+		if (this.onPlayback) {
+			console.log('go to previous playback step');
+		}
+		else {
+			var currentStep = this.stepCreationView.getCurrentStep();
+			this.stepCreationView.saveStepInformation();
+			//Modify the current step (save the info)
+			///
+			if (currentStep !== 1) {
+				var previousStep = currentStep - 1;
+				this.stepCreationView.setToStep(previousStep);	
+			}
 		}
 
 	}.bind(this));
@@ -284,12 +291,7 @@ function _createTutorialSelectedHeader() {
 	this.nextStepView.surface = new Surface({
 		size: [undefined, 25],
 		content: 'Next step >>',
-		properties: {
-			backgroundColor: '#F8C408',
-			textAlign: 'center',
-			color: 'white',
-			borderRadius: '10px'
-		}
+		classes: ['npStepButton']
 	});
 
 	this.nextStepView.surface.on('click', function() {
@@ -300,15 +302,19 @@ function _createTutorialSelectedHeader() {
 		* It should also either automatically save the user's changes or ask if they want to save their edits
 		* (automatically will probably be the implementation);
 		*/
-
-		var currentStep = this.stepCreationView.getCurrentStep();
-		this.stepCreationView.saveStepInformation();
-		//Modify the current step (save the info)
-		///
-		var nextStep = currentStep + 1;
-		this.stepCreationView.setToStep(nextStep);
-
-
+		if (this.onPlayback) {
+			var currentStep = this.playbackCreationView.getCurrentStep();
+			var nextStep = currentStep + 1;
+			this.playbackCreationView.setToStep(nextStep);
+		}
+		else {
+			var currentStep = this.stepCreationView.getCurrentStep();
+			this.stepCreationView.saveStepInformation();
+			//Modify the current step (save the info)
+			///
+			var nextStep = currentStep + 1;
+			this.stepCreationView.setToStep(nextStep);
+		}
 
 	}.bind(this));
 
@@ -338,6 +344,29 @@ function _createBodyView() {
 	this.stepCreationModifier = new StateModifier({
 		transform: Transform.translate(0, 0, 0)
 	});
+
+	//Create the creationView that is used for the playback
+
+
+	this.playbackViewofTutorial = new FlexibleLayout({
+		ratios: [1, 20, 1]
+	});
+
+	var playbackViews = [];
+
+	this.playbackViewofTutorial.sequenceFrom(playbackViews);
+	var leftGapView = new View();
+	var rightGapView = new View();
+	this.playbackCreationView = new CreationCenterView();
+
+	playbackViews.push(leftGapView);
+	playbackViews.push(this.playbackCreationView);
+	playbackViews.push(rightGapView);
+
+
+	this.playbackCreationView.setToPlaybackMode();
+
+	this.playbackViewModifier = new StateModifier({});
 
 	this.lightbox.show(this.alltutorialsScrollView);
 }
@@ -374,6 +403,16 @@ function _addListeners() {
 		this.stepCreationView.setToStep1();
 	}.bind(this));
 
+	this.alltutorialsScrollView.on('tutorialSelectedForPlayback', function() {
+		var tutorialName = this.alltutorialsScrollView.selected;
+		this.playbackCreationView.setTutorial(tutorialName);
+		this.changeToSelectedTutorialNavBar(tutorialName);
+		this.showTutorialPlaybackView();
+		this.playbackCreationView.setToStep(1);
+		//this.playbackCreationView.clearAllFields();
+		this.setPlayback(true);
+	}.bind(this));
+
 	var self = this;
 	//When the a pop up window needs to be hidden (in this case, the add new tutorial pop up)
 	this.createNewTutorialPopUpView.on('hideForm', function() {
@@ -403,6 +442,7 @@ function _addListeners() {
 		this.hideMenuDownBelowScreen();
 		this.lightbox.show(this.alltutorialsScrollView);
 		this.navbarLightBox.show(this.headerView);
+		this.setPlayback(false);
 	}.bind(this));
 
 	//When the user wants to add a new step to a tutorial, this event occurs
@@ -551,6 +591,14 @@ TutorialAppHomeView.prototype.showStepCreationView = function() {
 }
 
 /*
+* Show tutorial playback view
+*/
+TutorialAppHomeView.prototype.showTutorialPlaybackView = function() {
+	this.lightbox.show(this.playbackViewofTutorial);
+	this.hideMenuDownBelowScreen();
+}
+
+/*
 * Show a white surface in the body when no step is currently seleceted
 */
 TutorialAppHomeView.prototype.showBlankScreen = function() {
@@ -650,6 +698,12 @@ TutorialAppHomeView.prototype.hideMenuDownBelowScreen = function() {
 	});
 }
 
+/*
+* Sets the account field in the navigation bar to the email of the person signed in
+*
+* param:
+*	name: the email (or username)
+*/
 TutorialAppHomeView.prototype.setAccountName = function(name) {
 	this.navigationMenu.setAccountName(name);
 }
@@ -660,6 +714,13 @@ TutorialAppHomeView.prototype.setAccountName = function(name) {
 TutorialAppHomeView.prototype.showStepZeroScreen = function(tutorialName) {
 	this.lightbox.show(this.step0View);
 	this.step0View.setTutorialName(tutorialName);
+}
+
+/*
+* Set on playback to true or false;
+*/
+TutorialAppHomeView.prototype.setPlayback = function(value) {
+	this.onPlayback = value;
 }
 
 

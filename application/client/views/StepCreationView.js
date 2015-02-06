@@ -153,6 +153,13 @@ function _addListeners() {
 				self.searchableList.addItemToFilteredList(result[i]);
 			}
 		});
+
+		console.log('and also these');
+		Meteor.call('getStep0Items', tutorialName, function(error, result) {
+			for (var item in result) {
+				self.searchableList.addItemToFilteredList(item);
+			}
+		});
 	}.bind(this));
 
 	// this.creationCenterView.on('clickedLeftNounSurface', function() {

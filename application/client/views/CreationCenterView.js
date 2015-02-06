@@ -14,6 +14,7 @@ CreationCenterView = function () {
     View.apply(this, arguments);
 
     this.viewsInCreationView = [];
+    this.currentStep = undefined;
 
     _createLayout.call(this);
     _addTitleSurface.call(this);
@@ -275,9 +276,37 @@ CreationCenterView.prototype.setTutorial = function(tutorialTitle) {
 * Populate the step creation view surfaces with the content from the step currently being viewed
 */
 CreationCenterView.prototype.populateWithStepInfo = function(stepInfo) {
+	console.log('yooo');
 	this.sentenceView.populateWithStepInfoData(stepInfo);
 	this.stepDescriptionBoxSurface.setValue(stepInfo.description);
+	console.log(this);
 }
+
+/*
+* Set the information that is being displayed to the stepNumber passed into the funciton
+*/
+CreationCenterView.prototype.setToStep = function(stepNumber) {
+	var self = this;
+
+	var tutorialName = this.getTitle();
+	this.setTitleToSelectedStep('Step ' + stepNumber, tutorialName);
+	this.currentStep = stepNumber;
+
+	Meteor.call('getTutorialStepInformation', tutorialName, stepNumber, function(error, result) {
+		console.log(result);
+		self.populateWithStepInfo(result);
+		console.log(self);
+	});
+
+}
+
+/*
+* Get the current step that the view is set on
+*/
+CreationCenterView.prototype.getCurrentStep = function() {
+	return this.currentStep;
+}
+
 
 CreationCenterView.prototype.clearAllFields = function() {
 	this.titleSurface.setContent('New Step');
@@ -330,6 +359,15 @@ CreationCenterView.prototype.getStepNumber = function() {
 	var stepTitle = this.titleSurface.getContent();
 	var stepNumber = parseInt(stepTitle.split(' ')[1]);
 	return stepNumber;
+}
+
+/*
+* Sets the surfaces and objects in this view so that the nothing in the tutorial is editable and
+* the user is only allowed to navigate through the tutorial (and eventually mark it up where things
+* in the tutorial are unclear
+*/
+CreationCenterView.prototype.setToPlaybackMode = function() {
+
 }
 
 CreationCenterView.DEFAULT_OPTIONS = {};

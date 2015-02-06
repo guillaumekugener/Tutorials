@@ -15,10 +15,11 @@ Meteor.methods({
 	* The method that inserts a new element into the tutorials colleciton. The object inserted (doc) has the following
 	* properties:
 	* 	name -> the name of the tutorial, given on insert
-	*	authors -> a set of the names of the authors of the tutorial (will be based on account usernames)
+	*	author -> a set of the names of the authors of the tutorial (will be based on account usernames)
 	*	description -> a description of the tutorial
 	*	steps -> an array that contains all the step objects of the tutorial
 	*	items -> a set of the id's of the items that can be found in this tutorial
+	*	itemsAddedAtCreation -> a set of the names of the items that were added at the step 0 phase
 	*	verbs -> a set of the id's of all the verbs that can be found in this tutorial
 	*
 	* Name and authors will have values when the tutorial is first created (and description might also have one as well)
@@ -41,7 +42,8 @@ Meteor.methods({
 		}
 
 		//Get the email address of the current user
-		var author = Meteor.user().emails[0].address;
+		var user = Meteor.user();
+		var author = user.emails[0].address;
 		doc.author = author;
 
 		return Tutorials.insert(doc);
@@ -182,7 +184,7 @@ Meteor.methods({
 			allItems[item] = true;
 		}
 
-		tutorialInfo.items = allItems;
+		tutorialInfo.itemsAddedAtCreation = allItems;
 
 		Tutorials.update({name: tutorialName}, tutorialInfo);
 	},
@@ -213,5 +215,13 @@ Meteor.methods({
 
 		var found = Tutorials.find({name: search}).fetch();
 		return found;
+	},
+	/*
+	* Returns the items that the user created during step 0
+	*/
+	getStep0Items: function(tutorialName) {
+		var tutorialInfo = Tutorials.findOne({name: tutorialName});
+
+		return tutorialInfo.itemsAddedAtCreation;
 	}
 });

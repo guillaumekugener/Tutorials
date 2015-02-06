@@ -166,6 +166,7 @@ SentenceView.prototype = Object.create(View.prototype);
 SentenceView.prototype.constructor = SentenceView;
 
 SentenceView.prototype.populateWithStepInfoData = function(stepInfo) {
+	console.log(stepInfo);
 	this.leftNounSurface.setContent(stepInfo['item1']);
 	this.rightNounSurface.setContent(stepInfo['item2']);
 	this.verbSurface.setContent(stepInfo['verb']);

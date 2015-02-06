@@ -70,6 +70,10 @@ function _addListeners() {
 	this.tutorialOverviewView.on('continueToStepsView', function() {
 		this._eventOutput.emit('tutorialWasSelectedOrUnselected');
 	}.bind(this));
+
+	this.tutorialOverviewView.on('continueToTutorialPlayback', function() {
+		this._eventOutput.emit('tutorialSelectedForPlayback');
+	}.bind(this));
 }
 
 AllTutorialsView.prototype = Object.create(View.prototype);
@@ -103,6 +107,7 @@ AllTutorialsView.prototype.addItemToList = function(self, doc) {
 			Meteor.call('getTutorialHomeScreenInfo', tutorialName, function(error, result) {
 				self.tutorialOverviewView.setTitleInformation({
 					title: result.name,
+					author: result.author,
 					numberOfSteps: result.steps.length
 				});
 			});

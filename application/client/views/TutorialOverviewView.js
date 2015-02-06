@@ -163,7 +163,7 @@ function _createBody() {
 
 	//Add the continue to full tutorial button
 	this.viewFullTutorialButtonSurface = new Surface({
-		content: "View complete tutorial",
+		content: "view complete tutorial",
 		size: [300, 60]
 	});
 
@@ -176,6 +176,21 @@ function _createBody() {
 	});
 
 	this.layout.footer.add(viewFullTutorialButtonModifier).add(this.viewFullTutorialButtonSurface);
+
+	//Add the playback button
+	this.playbackOfTutorialButtonSurface = new Surface({
+		content: "tutorial playback",
+		size: [300, 60],
+		classes: ['playbackButtonSurface']
+	});
+
+	var playbackButtonModifier = new StateModifier({
+		align: [0, 0.5],
+		origin: [0, 0.5],
+		transform: Transform.translate(320, 0, 0)
+	});
+
+	this.layout.footer.add(playbackButtonModifier).add(this.playbackOfTutorialButtonSurface);
 
 }
 
@@ -190,6 +205,10 @@ function _addListeners() {
 	//tutorial overview screen to the tutorial steps screen
 	this.viewFullTutorialButtonSurface.on('click', function() {
 		this._eventOutput.emit('continueToStepsView');
+	}.bind(this));
+
+	this.playbackOfTutorialButtonSurface.on('click', function() {
+		this._eventOutput.emit('continueToTutorialPlayback');
 	}.bind(this));
 
 	//When the user uses the search bar to look through all of the items in a tutorial, this event
@@ -216,6 +235,8 @@ TutorialOverviewView.prototype.constructor = TutorialOverviewView;
 */
 TutorialOverviewView.prototype.setTitleInformation = function(doc) {
 	this.tutorialBeingViewed = doc.title;
+
+	console.log(doc);
 
 	var parsedAuthors = doc.author;
 	var newContent = '<div>'+doc.title+'</div><br><span id="authors">authors: '+parsedAuthors+'</span>';
