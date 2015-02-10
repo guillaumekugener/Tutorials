@@ -10,6 +10,7 @@ var surfaces = [];
 SentenceView = function () {
     View.apply(this, arguments);
 
+    this.onPlayBackMode = false;
 
     _createLayout.call(this);
     _addSurfaces.call(this);
@@ -109,11 +110,13 @@ function _addListeners() {
 	}.bind(this));
 
 	this.leftNounSurface.on('click', function() {
-		this.selected = 'leftNounSurface';
-		this.rightNounSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
-		this.leftNounSurface.setProperties({'border':'5px dotted white', 'paddingTop': '10px'});
-		this.verbSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
-		this._eventOutput.emit('clickedOnLeftNounSurface');
+		if (!this.onPlayBackMode) {
+			this.selected = 'leftNounSurface';
+			this.rightNounSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
+			this.leftNounSurface.setProperties({'border':'5px dotted white', 'paddingTop': '10px'});
+			this.verbSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
+			this._eventOutput.emit('clickedOnLeftNounSurface');
+		}
 	}.bind(this));
 
 	this.rightNounSurface.on('mouseover', function() {
@@ -131,11 +134,13 @@ function _addListeners() {
 	}.bind(this));
 
 	this.rightNounSurface.on('click', function() {
-		this.selected = 'rightNounSurface';
-		this.rightNounSurface.setProperties({'border':'5px dotted white', 'paddingTop': '10px'});
-		this.leftNounSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
-		this.verbSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
-		this._eventOutput.emit('clickedOnRightNounSurface');
+		if (!this.onPlayBackMode) {		
+			this.selected = 'rightNounSurface';
+			this.rightNounSurface.setProperties({'border':'5px dotted white', 'paddingTop': '10px'});
+			this.leftNounSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
+			this.verbSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
+			this._eventOutput.emit('clickedOnRightNounSurface');
+		}
 	}.bind(this));
 
 	this.verbSurface.on('mouseover', function() {
@@ -153,11 +158,14 @@ function _addListeners() {
 	}.bind(this));
 
 	this.verbSurface.on('click', function() {
-		this.selected = 'verbSurface';
-		this.rightNounSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
-		this.leftNounSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
-		this.verbSurface.setProperties({'border':'5px dotted white', 'paddingTop': '10px'});
-		this._eventOutput.emit('clickedOnVerbSurface');
+		if (!this.onPlayBackMode) {
+			console.log('do shit');
+			this.selected = 'verbSurface';
+			this.rightNounSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
+			this.leftNounSurface.setProperties({'border':'0px dotted white', 'paddingTop': '15px'});
+			this.verbSurface.setProperties({'border':'5px dotted white', 'paddingTop': '10px'});
+			this._eventOutput.emit('clickedOnVerbSurface');	
+		}
 
 	}.bind(this));
 }
@@ -219,6 +227,14 @@ SentenceView.prototype.getSentenceContent = function() {
 	}
 
 	return info;
+}
+
+/*
+* Sets whether or not the on playback mode is on or off, so that no action listeners are fired
+* parameter: onOrOff: true or false
+*/
+SentenceView.prototype.setOnPlaybackMode = function(onOrOff) {
+	this.onPlayBackMode = onOrOff;
 }
 
 SentenceView.DEFAULT_OPTIONS = {

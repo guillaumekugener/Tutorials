@@ -248,7 +248,15 @@ function _createTutorialSelectedHeader() {
 
 	this.previousStepView.surface.on('click', function() {
 		if (this.onPlayback) {
-			console.log('go to previous playback step');
+			var currentStepInfo = this.playbackCreationView.getCurrentStep();
+			console.log('current step' + currentStepInfo.currentStep);
+
+			if (currentStepInfo.currentStep !== 1) {
+				var previousStep = currentStepInfo.currentStep - 1;
+				this.playbackCreationView.setToStep(previousStep);
+				this.stepCreationView.setToStep(previousStep);
+			}
+
 		}
 		else {
 			var currentStep = this.stepCreationView.getCurrentStep();
@@ -299,9 +307,15 @@ function _createTutorialSelectedHeader() {
 		*/
 		if (this.onPlayback) {
 			console.log('in playback next');
-			var currentStep = this.playbackCreationView.getCurrentStep();
-			var nextStep = currentStep + 1;
-			this.playbackCreationView.setToStep(nextStep);
+			var currentStepInfo = this.playbackCreationView.getCurrentStep();
+			if (!currentStepInfo.lastStep) {
+				var nextStep = currentStepInfo.currentStep + 1;
+				this.playbackCreationView.setToStep(nextStep);
+				//Why we need to change stepCreation view to have the sentence view change is an absolute mystery to 
+				//me right now. Will work on changing this but no idea why it is behaving this way currently....
+				this.stepCreationView.setToStep(nextStep);		
+			}
+
 		}
 		else {
 			var currentStep = this.stepCreationView.getCurrentStep();
@@ -353,14 +367,11 @@ function _createBodyView() {
 	this.playbackViewofTutorial.sequenceFrom(playbackViews);
 	var leftGapView = new View();
 	var rightGapView = new View();
-	this.playbackCreationView = new CreationCenterView();
+	this.playbackCreationView = new PlayBackView();
 
 	playbackViews.push(leftGapView);
 	playbackViews.push(this.playbackCreationView);
 	playbackViews.push(rightGapView);
-
-
-	this.playbackCreationView.setToPlaybackMode();
 
 	this.playbackViewModifier = new StateModifier({});
 
@@ -396,15 +407,22 @@ function _addListeners() {
 		// this.slideMainViewToRight();
 		this.stepCreationView.setTutorialTitle(tutorialName);
 		this.showStepCreationView();
+		this.stepCreationView.setPlaybackMode(false);
 		this.stepCreationView.setToStep1();
 	}.bind(this));
 
 	this.alltutorialsScrollView.on('tutorialSelectedForPlayback', function() {
+		var totalSteps = this.alltutorialsScrollView.getTotalStepsForTutorialViewed();
 		var tutorialName = this.alltutorialsScrollView.selected;
-		this.playbackCreationView.setTutorial(tutorialName);
+		this.playbackCreationView.setTutorialTitle(tutorialName);
 		this.changeToSelectedTutorialNavBar(tutorialName);
 		this.showTutorialPlaybackView();
 		this.playbackCreationView.setToStep(1);
+		this.playbackCreationView.setTotalSteps(totalSteps);
+
+		this.stepCreationView.setTutorialTitle(tutorialName);
+		this.stepCreationView.setToStep(1);
+		this.stepCreationView.setPlaybackMode(true);
 		//this.playbackCreationView.clearAllFields();
 		this.setPlayback(true);
 	}.bind(this));

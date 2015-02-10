@@ -20,6 +20,7 @@ TutorialOverviewView = function () {
 
     //this.allItemsInTutorial = [];
     this.tutorialBeingViewed = undefined;
+    this.totalSteps = undefined;
     this.sideToSideFlexLayoutViews =[];
     this.sequentialViews = [];
 
@@ -293,6 +294,7 @@ TutorialOverviewView.prototype.populateList = function(tutorialName) {
 TutorialOverviewView.prototype.setTitleInformation = function(doc) {
 	this.tutorialBeingViewed = doc.title;
 
+	this.setTotalSteps(doc.numberOfSteps);
 	console.log(doc);
 
 	var parsedAuthors = doc.author;
@@ -305,6 +307,20 @@ TutorialOverviewView.prototype.setTitleInformation = function(doc) {
 	
 	this.itemsInTutorialList.clearListOfElements();
 	this.itemsInTutorialList.setPlaceholder('search for items in tutorial');
+}
+
+/*
+* Sets the total number of steps that there are in this tutorial
+*/
+TutorialOverviewView.prototype.setTotalSteps = function(totalSteps) {
+	this.totalSteps = totalSteps;
+}
+
+/*
+* Gets the total number of steps of the current tutorial
+*/
+TutorialOverviewView.prototype.getTotalSteps = function() {
+	return this.totalSteps;
 }
 
 

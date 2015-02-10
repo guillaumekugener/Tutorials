@@ -80,6 +80,13 @@ AllTutorialsView.prototype = Object.create(View.prototype);
 AllTutorialsView.prototype.constructor = AllTutorialsView;
 
 /*
+* Gets the total number of steps of the tutorial that was selected
+*/
+AllTutorialsView.prototype.getTotalStepsForTutorialViewed = function() {
+	return this.tutorialOverviewView.getTotalSteps();
+}
+
+/*
 * Add a tutorial to the scrollview
 */
 AllTutorialsView.prototype.addItemToList = function(self, doc) {

@@ -355,6 +355,13 @@ CreationCenterView.prototype.getStepInformation = function() {
 	return stepInfoToSave;
 }
 
+/*
+* Reset the SentenceView, for tutorial playback
+*/
+CreationCenterView.prototype.resetSentenceView = function() {
+	this.sentenceView.rightNounSurface.setProperties({backgroundColor: 'red'});
+}
+
 CreationCenterView.prototype.getStepNumber = function() {
 	var stepTitle = this.titleSurface.getContent();
 	var stepNumber = parseInt(stepTitle.split(' ')[1]);
@@ -366,8 +373,8 @@ CreationCenterView.prototype.getStepNumber = function() {
 * the user is only allowed to navigate through the tutorial (and eventually mark it up where things
 * in the tutorial are unclear
 */
-CreationCenterView.prototype.setToPlaybackMode = function() {
-
+CreationCenterView.prototype.setPlaybackMode = function(onOrOff) {
+	this.sentenceView.setOnPlaybackMode(onOrOff);
 }
 
 CreationCenterView.DEFAULT_OPTIONS = {};

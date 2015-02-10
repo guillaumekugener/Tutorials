@@ -346,4 +346,11 @@ StepCreationView.prototype.saveStepInformation = function() {
 
 }
 
+/*
+* Set plaback mode on or off
+*/
+StepCreationView.prototype.setPlaybackMode = function(onOrOff) {
+	this.creationCenterView.setPlaybackMode(onOrOff);
+}
+
 StepCreationView.DEFAULT_OPTIONS = {};
