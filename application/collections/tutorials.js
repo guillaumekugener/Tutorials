@@ -73,14 +73,14 @@ Meteor.methods({
 			var prevItem2 = previousSteps[doc.stepNumber-1].item2;
 			var prevVerb = previousSteps[doc.stepNumber-1].verb;
 
-			if (prevItem1 !== 'Put an item here...') {
+			if (prevItem1 !== 'Put an item here...' && prevItem1 !== undefined) {
 				items[prevItem1] -= 1;
 			}
-			if (prevItem2 !== 'Put an item here...') {
+			if (prevItem2 !== 'Put an item here...' && prevItem1 !== undefined) {
 				items[prevItem2] -= 1;
 			}
 
-			if (prevVerb !== 'Put the verb here...') {
+			if (prevVerb !== 'Put the verb here...' && prevItem1 !== undefined) {
 				verbs[prevVerb] -= 1;
 			}
 
@@ -115,7 +115,7 @@ Meteor.methods({
 			});
 		}
 
-		if (doc.item1 !== 'Put an item here...') {
+		if (doc.item1 !== 'Put an item here...' && doc.item1 !== undefined) {
 			//Add the items to items set for the tutorial
 			if (!items[doc.item1]) {
 				items[doc.item1] = 0;
@@ -123,7 +123,7 @@ Meteor.methods({
 			items[doc.item1] += 1;
 		}
 
-		if (doc.item2 !== 'Put an item here...') {
+		if (doc.item2 !== 'Put an item here...' && doc.item2 !== undefined) {
 			//Add the items to items set for the tutorial
 			if (!items[doc.item2]) {
 				items[doc.item2] = 0;
@@ -131,7 +131,7 @@ Meteor.methods({
 			items[doc.item2] += 1;
 		}
 
-		if (doc.verb !== 'Put the verb here...') {
+		if (doc.verb !== 'Put the verb here...' && doc.item2 !== undefined) {
 			//Add the verb to the verbs set for the tutorial
 			if (!verbs[doc.verb]) {
 				verbs[doc.verb] = 0;

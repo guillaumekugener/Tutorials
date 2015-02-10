@@ -58,7 +58,7 @@ function _createBodyViews() {
 	var leftHandGap = new View();
 	this.bodyFlexibleLayoutViews.push(leftHandGap);
 
-	this.allItemsScrollview = new SearchableItemsListView();
+	this.allItemsScrollview = new SearchableItemsListView(false);
 	this.bodyFlexibleLayoutViews.push(this.allItemsScrollview);
 
 	this.allItemsScrollview.setPlaceholder('search for an item in the database');

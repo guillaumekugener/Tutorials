@@ -93,8 +93,6 @@ function _addLeftBufferWithMenu() {
 }
 
 function _addItemVerbListView() {
-
-
 	this.itemVerbListView = new ItemVerbListView();
 
 	this.itemVerbListViewModifier = new StateModifier({
@@ -112,7 +110,7 @@ function _addItemVerbListView() {
 * Add the list on the right hand side of the screen that will allow users to add the items that they want
 */
 function _addSearchableList() {
-	this.searchableList = new SearchableItemsListView();
+	this.searchableList = new SearchableItemsListView(false);
 	this.searchableList.setPlaceholder('');
 	this.searchableList.addRightSideIcon('img/plus.png');
 
@@ -153,22 +151,12 @@ function _addListeners() {
 				self.searchableList.addItemToFilteredList(result[i]);
 			}
 		});
-
-		console.log('and also these');
 		Meteor.call('getStep0Items', tutorialName, function(error, result) {
 			for (var item in result) {
 				self.searchableList.addItemToFilteredList(item);
 			}
 		});
 	}.bind(this));
-
-	// this.creationCenterView.on('clickedLeftNounSurface', function() {
-
-	// }.bind(this));
-
-	// this.creationCenterView.on('clickedLeftNounSurface', function() {
-
-	// }.bind(this));
 
 	this.creationCenterView.on('clickedAVerb', function() {
 		this.selectedSurface = 'verb';
@@ -227,33 +215,6 @@ function _addListeners() {
 		}
 	}.bind(this));
 
-	// this.itemVerbListView.on('showPopUpNouns', function() {
-	// 	self.formPopUp.setType('nouns');
-	// 	self.formPopUpModifier.setVisible(true);
-	// 	self.formPopUp.additionalFieldsModifier.setVisible(true);
-	// }.bind(this));
-
-	// this.itemVerbListView.on('showPopUpVerbs', function() {
-	// 	self.formPopUp.setType('verbs');
-	// 	self.formPopUpModifier.setVisible(true);
-	// 	self.formPopUp.additionalFieldsModifier.setVisible(false);
-
-	// }.bind(this));
-
-	// this.itemVerbListView.on('selectedANoun', function() {
-	// 	var selectedItem = this.itemVerbListView.itemListView.getSelected();
-	// 	var surfaceToChange = this.selectedSurface;
-
-	// 	this.creationCenterView.setSurfaceContent(surfaceToChange, selectedItem);
-	// }.bind(this));
-
-	// this.itemVerbListView.on('selectedAVerb', function() {
-	// 	var selectedItem = this.itemVerbListView.verbsListView.getSelected();
-	// 	var surfaceToChange = this.selectedSurface;
-
-	// 	this.creationCenterView.setSurfaceContent(surfaceToChange, selectedItem);		
-	// }.bind(this));
-
 	//We want to make sure that we save all of the information correctly in the database
 	this.creationCenterView.on('createAndAddStepToTutorial', function() {
 		var sentenceInfo = this.creationCenterView.getStepInformation();
@@ -270,15 +231,16 @@ function _addListeners() {
 		};
 
 		Meteor.call('addOrModifyStep', stepInfoToStore, function(error, result) {});
-		Meteor.call('addVerbToNoun', sentenceInfo['leftNoun'], sentenceInfo['verb'], function(error, result) {});
-		Meteor.call('addVerbToNoun', sentenceInfo['rightNoun'], sentenceInfo['verb'], function(error, result) {});
+
+		if (sentenceInfo['item1'] !== 'Put an item here' && sentenceInfo['item1'] !== undefined) {
+			Meteor.call('addVerbToNoun', sentenceInfo['item1'], sentenceInfo['verb'], function(error, result) {});
+		}
+		if (sentenceInfo['item2'] !== 'Put an item here' && sentenceInfo['item2'] !== undefined) {
+			Meteor.call('addVerbToNoun', sentenceInfo['item2'], sentenceInfo['verb'], function(error, result) {});
+		}
 
 		this._eventOutput.emit('createdAndAddedStepToTutorial');
 	}.bind(this));
-
-	// this.creationCenterView.on('clickedVerbSurface', function() {
-	// 	//this.showAList('verbs');
-	// }.bind(this));
 
 	this.creationCenterView.on('clickedLeftNounSurface', function() {
 		this.selectedSurface = 'leftNoun';
@@ -291,14 +253,13 @@ function _addListeners() {
 	//When the creation for gets closed, we want to add some items to the object surfaces
 	this.formPopUp.on('hideForm', function() {
 		self.formPopUpModifier.setVisible(false);
-		console.log(this.selectedSurface);
 		if (this.selectedSurface === 'verb') {
 			var sentenceInfo = this.creationCenterView.getStepInformation();
 			this.creationCenterView.setSurfaceContent('verbSurface', this.formPopUp.justEnteredText());
-			if (sentenceInfo['item1'] !== 'Put an item here') {
-				Meteor.call('addVerbToNoun', sentenceInfo['item'], sentenceInfo['verb'], function(error, result) {});
+			if (sentenceInfo['item1'] !== 'Put an item here' && sentenceInfo['item1'] !== undefined) {
+				Meteor.call('addVerbToNoun', sentenceInfo['item1'], sentenceInfo['verb'], function(error, result) {});
 			}
-			if (sentenceInfo['item2'] !== 'Put an item here') {
+			if (sentenceInfo['item2'] !== 'Put an item here' && sentenceInfo['item2'] !== undefined) {
 				Meteor.call('addVerbToNoun', sentenceInfo['item2'], sentenceInfo['verb'], function(error, result) {});
 			}
 		}
@@ -375,8 +336,14 @@ StepCreationView.prototype.saveStepInformation = function() {
 	stepInfo.stepNumber = this.getCurrentStep();
 
 	Meteor.call('addOrModifyStep', stepInfo, function(error, result) {} );
-	Meteor.call('addVerbToNoun', stepInfo['item1'], stepInfo['verb'], function(error, result) {});
-	Meteor.call('addVerbToNoun', stepInfo['item2'], stepInfo['verb'], function(error, result) {});
+	if (stepInfo['item1'] && stepInfo['verb']) {
+		Meteor.call('addVerbToNoun', stepInfo['item1'], stepInfo['verb'], function(error, result) {});	
+	}
+
+	if (stepInfo['item2'] && stepInfo['verb']) {
+		Meteor.call('addVerbToNoun', stepInfo['item2'], stepInfo['verb'], function(error, result) {});	
+	}
+
 }
 
 StepCreationView.DEFAULT_OPTIONS = {};

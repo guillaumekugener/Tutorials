@@ -32,7 +32,7 @@ function _addSurfaces() {
 
 	this.leftNounSurface = new Surface({
 		size: [undefined, 50],
-		content: 'Put an item here',
+		content: this.options.noSelectedItemText,
 		properties: {
 			backgroundColor: '#3B5998',
 			textAlign: 'center',
@@ -50,7 +50,7 @@ function _addSurfaces() {
 
 	this.rightNounSurface = new Surface({
 		size: [undefined, 50],
-		content: 'Put an item here',
+		content: this.options.noSelectedItemText,
 		properties: {
 			backgroundColor: '#3B5998',
 			textAlign: 'center',
@@ -69,7 +69,7 @@ function _addSurfaces() {
 
 	this.verbSurface = new Surface({
 		size: [undefined, 50],
-		content: 'Put the verb here',
+		content: this.options.noSelectedVerbText,
 		properties: {
 			backgroundColor: '#639BF1',
 			textAlign: 'center',
@@ -166,7 +166,6 @@ SentenceView.prototype = Object.create(View.prototype);
 SentenceView.prototype.constructor = SentenceView;
 
 SentenceView.prototype.populateWithStepInfoData = function(stepInfo) {
-	console.log(stepInfo);
 	this.leftNounSurface.setContent(stepInfo['item1']);
 	this.rightNounSurface.setContent(stepInfo['item2']);
 	this.verbSurface.setContent(stepInfo['verb']);
@@ -194,6 +193,10 @@ SentenceView.prototype.setSurfaceContent = function(surfaceName, content) {
 	}
 }
 
+/*
+* Gets and returns the content of the sentence surfaces. If a surface has no conent
+* database item attached to it, then it will return undefined
+*/
 SentenceView.prototype.getSentenceContent = function() {
 	//Content might be put noun here... which might be a problem or not
 
@@ -202,7 +205,23 @@ SentenceView.prototype.getSentenceContent = function() {
 		rightNoun: this.rightNounSurface.getContent(),
 		verb: this.verbSurface.getContent()
 	};
+
+	if (info.leftNoun === this.options.noSelectedItemText) {
+		info.leftNoun = undefined;
+	}
+
+	if (info.rightNoun === this.options.noSelectedItemText) {
+		info.rightNoun = undefined;
+	}
+
+	if (info.verb === this.options.noSelectedVerbText) {
+		info.verb = undefined;
+	}
+
 	return info;
 }
 
-SentenceView.DEFAULT_OPTIONS = {};
+SentenceView.DEFAULT_OPTIONS = {
+	noSelectedItemText: 'Put an item here...',
+	noSelectedVerbText: 'Put the verb here...'
+};

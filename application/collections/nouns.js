@@ -23,7 +23,9 @@ Meteor.methods({
 	},
 	//Add a verb to the verbs set of the noun
 	addVerbToNoun: function(noun, verb) {
-		console.log(noun + ", " + verb);
+		if (noun === undefined || verb === undefined) {
+			console.log('passing an undefined noun or verb, fix is required');
+		}
 		var nounObj = Nouns.findOne({name: noun});
 		var nounVerbs = nounObj.verbs;
 

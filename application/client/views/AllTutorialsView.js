@@ -110,6 +110,8 @@ AllTutorialsView.prototype.addItemToList = function(self, doc) {
 					author: result.author,
 					numberOfSteps: result.steps.length
 				});
+
+				self.tutorialOverviewView.populateList(tutorialName);
 			});
 
 			itemSurface.selected = true;

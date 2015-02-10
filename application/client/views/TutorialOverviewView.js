@@ -56,6 +56,14 @@ function _createLayouts() {
 }
 
 function _createHeader() {
+	var backgroundSurface = new Surface({
+		properties: {
+			backgroundColor: 'white'
+		}
+	});
+
+	this.layout.header.add(backgroundSurface);
+
 	this.tutorialTitleSurface = new Surface({
 		content: '<div>the tutorial title will apear here</div><br><span id="authors">authors will appear here</span>',
 		classes: ['titleHeader']
@@ -64,12 +72,13 @@ function _createHeader() {
 	this.tutorialTitleSurface.addClass("tutorialOverview");
 
 	this.tutorialTitleModifier = new StateModifier({
-		transform: Transform.translate(320, 0, 0)
+		transform: Transform.translate(320, 0, 1)
 	});
 
 	this.tutorialStepsSurface = new Surface({
 		content: '<div>-- Steps</div>',
-		classes: ['titleHeader']
+		classes: ['titleHeader'],
+		size: [400, undefined]
 	});
 
 	this.tutorialStepsSurface.addClass("tutorialOverviewSteps");
@@ -77,7 +86,8 @@ function _createHeader() {
 
 	this.tutorialStepsModifier = new StateModifier({
 		align: [1, 0],
-		origin: [1, 0]
+		origin: [1, 0],
+		transform: Transform.translate(0, 0, 1)
 	});
 
 	this.layout.header.add(this.tutorialTitleModifier).add(this.tutorialTitleSurface);
@@ -89,9 +99,9 @@ function _createBody() {
 	//////////////////////////////////////
 	//All items in the tutorial scrollview, that appears on the left hand side of the
 	//tutorial overview
-	this.itemsInTutorialList = new SearchableItemsListView();
+	this.itemsInTutorialList = new SearchableItemsListView(true);
 	this.itemsInTutorialList.lookThroughTutorial();
-	this.itemsInTutorialList.setPlaceholder('search for items in tutorial');
+	this.itemsInTutorialList.removeSearchBar();
 
 	this.itemsInTutorialListModifier = new StateModifier({
 		size: [this.options.itemsListSize, undefined]
@@ -137,6 +147,29 @@ function _createBody() {
 		size: [window.innerWidth-300, undefined]
 	});
 
+	var inBodyBackgroundTop = new Surface({
+		properties: {
+			backgroundColor: 'white'
+		}
+	});
+
+	var inBodyBackgroundTopModifier = new StateModifier({
+		transform: Transform.translate(0, 0, 1)
+	});
+	this.inBodyHeaderFooter.header.add(inBodyBackgroundTopModifier).add(inBodyBackgroundTop);
+
+	var inBodyBackgroundBottom = new Surface({
+		properties: {
+			backgroundColor: 'white'
+		}
+	});
+
+	var inBodyBackgroundBottomModifier = new StateModifier({
+		transform: Transform.translate(0, 0, 1)
+	});
+
+	this.inBodyHeaderFooter.footer.add(inBodyBackgroundBottomModifier).add(inBodyBackgroundBottom);
+
 	this.inBodyHeaderFooter.content.add(this.flexBodyLayoutModifier).add(this.sideToSideFlexLayoutInBody);
 	//
 
@@ -161,6 +194,18 @@ function _createBody() {
 
 	this.layout.content.add(this.mainSequentialLayoutInBody);
 
+	var footerBackground = new Surface({
+		properties: {
+			backgroundColor: 'white'
+		}
+	});
+
+	var footerBackgroundModifier = new StateModifier({
+		transform: Transform.translate(0, 0, 1)
+	});
+
+	this.layout.footer.add(footerBackgroundModifier).add(footerBackground);
+
 	//Add the continue to full tutorial button
 	this.viewFullTutorialButtonSurface = new Surface({
 		content: "view complete tutorial",
@@ -172,7 +217,7 @@ function _createBody() {
 	var viewFullTutorialButtonModifier = new StateModifier({
 		align: [1, 0.5],
 		origin: [1, 0.5],
-		transform: Transform.translate(-20, 0, 0)
+		transform: Transform.translate(-20, 0, 2)
 	});
 
 	this.layout.footer.add(viewFullTutorialButtonModifier).add(this.viewFullTutorialButtonSurface);
@@ -187,11 +232,10 @@ function _createBody() {
 	var playbackButtonModifier = new StateModifier({
 		align: [0, 0.5],
 		origin: [0, 0.5],
-		transform: Transform.translate(320, 0, 0)
+		transform: Transform.translate(320, 0, 2)
 	});
 
 	this.layout.footer.add(playbackButtonModifier).add(this.playbackOfTutorialButtonSurface);
-
 }
 
 function _addListeners() {
@@ -213,22 +257,35 @@ function _addListeners() {
 
 	//When the user uses the search bar to look through all of the items in a tutorial, this event
 	//is fired for every key up (every time they type);
-	this.itemsInTutorialList.on('userSearchedForItemInTutorial', function() {
-		var self = this;
-		var criteria = this.itemsInTutorialList.getUsersSearchCriteria();
-		this.itemsInTutorialList.clearListOfElements();
+	// this.itemsInTutorialList.on('userSearchedForItemInTutorial', function() {
+	// 	var self = this;
+	// 	var criteria = this.itemsInTutorialList.getUsersSearchCriteria();
+	// 	this.itemsInTutorialList.clearListOfElements();
 		
-		Meteor.call('getTutorialMatchingItems', this.tutorialBeingViewed, criteria, function(error, result) {
-			for (var i = 0; i< result.length; i++) {
-				self.itemsInTutorialList.addItemToFilteredList(result[i]);
-			}
-		});
-	}.bind(this));
+	// 	Meteor.call('getTutorialMatchingItems', this.tutorialBeingViewed, criteria, function(error, result) {
+	// 		for (var i = 0; i< result.length; i++) {
+	// 			self.itemsInTutorialList.addItemToFilteredList(result[i]);
+	// 		}
+	// 	});
+	// }.bind(this));
 }
 
 
 TutorialOverviewView.prototype = Object.create(View.prototype);
 TutorialOverviewView.prototype.constructor = TutorialOverviewView;
+
+/*
+* Populates the searchable list with all the elements in the tutorial
+*/
+TutorialOverviewView.prototype.populateList = function(tutorialName) {
+	var self = this;
+
+	Meteor.call('getTutorialMatchingItems', tutorialName, '', function(error, result) {
+		for (var i = 0; i< result.length; i++) {
+			self.itemsInTutorialList.addItemToFilteredList(result[i]);
+		}
+	});
+}
 
 /*
 * Set the title information in the tutorial overview to be the information of the selected tutorial

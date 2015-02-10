@@ -213,6 +213,12 @@ function _addForgotPasswordNewUserButtons() {
 function _addListeners() {
 	var self = this;
 
+	this.passwordInputSurface.on('keyup', function(evt) {
+		if (evt.keyCode === 13) {
+			login(this);
+		}
+	}.bind(this));
+
 	/*
 	* When the user clicks on the create an account link
 	*/
@@ -230,52 +236,61 @@ function _addListeners() {
 		
 	}.bind(this));
 
+
+
 	/*
 	* Logging into the application
 	*/
 	this.loginButtonSurface.on('click', function() {
-		var email = this.usernameInputSurface.getValue();
-		var password = this.passwordInputSurface.getValue();
-
-		if (this.loginButtonSurface.getContent() === 'sign up') {
-			var verification = this.verificationSurface.getValue();
-
-			if (password !== verification) {
-				//Notify user that the password and verifier do not match
-			}
-			else {
-				Accounts.createUser({email: email, password:password}, function(error) {
-					if (error) {
-						//Inform the user that account creation failed
-						console.log('error');
-					}
-					else {
-						//Success! Account has been created and the suer has logged in successfully
-						//Fire the show everything event here
-						console.log('account created');
-						//Proceed to show the main tutorial app view
-						self._eventOutput.emit('createdAnAccount');
-					}
-				});
-			}
-		}
-		else {
-			console.log('login');
-			Meteor.loginWithPassword(email, password, function(error) {
-				if (error) {
-					//Do something
-				}
-				else {
-					//They logged in, fire the show everything event
-					self._eventOutput.emit('loggedInAnAccount');
-				}
-			});	
-		}
-
+		login(this);
 	}.bind(this));
 }
 
+function login(self) {
+	var email = self.usernameInputSurface.getValue();
+	var password = self.passwordInputSurface.getValue();
 
+	if (self.loginButtonSurface.getContent() === 'sign up') {
+		var verification = self.verificationSurface.getValue();
+
+		if (password !== verification) {
+			//Notify user that the password and verifier do not match
+		}
+		else {
+			Accounts.createUser({email: email, password:password}, function(error) {
+				if (error) {
+					//Inform the user that account creation failed
+					console.log('error');
+				}
+				else {
+					//Success! Account has been created and the suer has logged in successfully
+					//Fire the show everything event here
+					console.log('account created');
+					//Proceed to show the main tutorial app view
+					self._eventOutput.emit('createdAnAccount');
+				}
+			});
+		}
+	}
+	else {
+		Meteor.loginWithPassword(email, password, function(error) {
+			if (error) {
+				//Do something
+				console.log(error);
+				if (error.error === 403) {
+					console.log('username error');
+				}
+
+				//if password error, the display something that says they entered the wrong password
+				//if a username error, then tell them the user name does not exist
+			}
+			else {
+				//They logged in, fire the show everything event
+				self._eventOutput.emit('loggedInAnAccount');
+			}
+		});	
+	}	
+}
 
 
 LoginView.prototype = Object.create(View.prototype);

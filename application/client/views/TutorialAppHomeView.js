@@ -23,7 +23,7 @@ var tutorialsInView = [];
 TutorialAppHomeView = function () {
     View.apply(this, arguments);
 
-    this.playback = false;
+    this.onPlayback = false;
 
     _createBlankBackgroundScreen.call(this);
     _createLayout.call(this);
@@ -241,12 +241,7 @@ function _createTutorialSelectedHeader() {
 	this.previousStepView.surface = new Surface({
 		size: [undefined, 25],
 		content: '<< Previous Step',
-		properties: {
-			backgroundColor: '#F8C408',
-			textAlign: 'center',
-			color: 'white',
-			borderRadius: '10px'			
-		}
+		classes: ['npStepButton']
 	});
 
 	var self = this;
@@ -303,6 +298,7 @@ function _createTutorialSelectedHeader() {
 		* (automatically will probably be the implementation);
 		*/
 		if (this.onPlayback) {
+			console.log('in playback next');
 			var currentStep = this.playbackCreationView.getCurrentStep();
 			var nextStep = currentStep + 1;
 			this.playbackCreationView.setToStep(nextStep);

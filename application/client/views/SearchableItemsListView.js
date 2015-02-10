@@ -10,11 +10,12 @@ var ImageSurface  = require('famous/surfaces/ImageSurface');
 /* Creates a Scrollview that has a searchbar at the top that allows users to search through
 * the elements in the Scrollview
 */
-SearchableItemsListView = function () {
+SearchableItemsListView = function (noScrollBar) {
     View.apply(this, arguments);
 
     this.itemsInTutorial = false;
     this.filteredItems = [];
+    this.noScrollBar = noScrollBar;
 
     this.selected = undefined;
 
@@ -51,33 +52,40 @@ function _createTopOfList() {
 		classes: ['topOfListHeader']
 	});
 
-	var headerViews = [];
-	var headerFlexLayout = new FlexibleLayout({
-		ratios: [10, 1]
+	var topBackgroundModifier = new StateModifier({
+		transform: Transform.translate(0, 0, 1)
 	});
 
-	this.leftGap = new View();
-	this.searchBarView = new SearchBarView();
-	this.rightGap = new View();
+	this.add(topBackgroundModifier).add(this.topBackgroundSurface);
 
-	headerFlexLayout.sequenceFrom(headerViews);
+	if (!this.noScrollBar) {	
+		var headerViews = [];
+		var headerFlexLayout = new FlexibleLayout({
+			ratios: [10, 1]
+		});
 
-	//headerViews.push(this.leftGap);
-	headerViews.push(this.searchBarView);
-	headerViews.push(this.rightGap);
+		this.leftGap = new View();
+		this.searchBarView = new SearchBarView();
+		this.rightGap = new View();
 
-	var searchBarViewModifier = new StateModifier({
-		// origin: [0.5, 0],
-		// align: [0.5, 0],
-		transform: Transform.translate(5, 5, 1)
-	});
+		headerFlexLayout.sequenceFrom(headerViews);
 
-	this.add(this.topBackgroundSurface);
-	this.add(searchBarViewModifier).add(headerFlexLayout);
+		//headerViews.push(this.leftGap);
+		headerViews.push(this.searchBarView);
+		headerViews.push(this.rightGap);
 
-	// topBackgroundSurface.on('click', function() {
-	// 	this.getItemsMatchingSearch();
-	// }.bind(this));
+		var searchBarViewModifier = new StateModifier({
+			// origin: [0.5, 0],
+			// align: [0.5, 0],
+			transform: Transform.translate(5, 5, 3)
+		});
+
+		this.add(searchBarViewModifier).add(headerFlexLayout);
+
+		// topBackgroundSurface.on('click', function() {
+		// 	this.getItemsMatchingSearch();
+		// }.bind(this));
+	}
 }
 
 /*
@@ -103,13 +111,15 @@ function _createScrollviewOfList() {
 }
 
 function _addListener() {
-	this.searchBarView.on('userSearched', function() {
-		if (!this.itemsInTutorial) {
-			this.getItemsMatchingSearch();		
-		}
-		this._eventOutput.emit('userSearchedForItemInTutorial');
+	if (!this.noScrollBar) {	
+		this.searchBarView.on('userSearched', function() {
+			if (!this.itemsInTutorial) {
+				this.getItemsMatchingSearch();		
+			}
+			this._eventOutput.emit('userSearchedForItemInTutorial');
 
-	}.bind(this));
+		}.bind(this));
+	}
 }
 
 SearchableItemsListView.prototype = Object.create(View.prototype);
@@ -171,7 +181,11 @@ SearchableItemsListView.prototype.getAndReturnSelected = function() {
 * Set the SearchbarView's placeholder
 */
 SearchableItemsListView.prototype.setPlaceholder = function(placeholder) {
-	this.searchBarView.setPlaceholder(placeholder);
+	//Not the right check. Should check that it is of type SearchBarView
+	if (this.searchBarView) {
+		this.searchBarView.setPlaceholder(placeholder);
+	}
+
 }
 
 /*
@@ -238,6 +252,13 @@ SearchableItemsListView.prototype.addSeparatorToList = function(separationName) 
 
 	this.filteredItems.push(itemSurface);
 	itemSurface.pipe(this.filteredItemsScrollview);	
+}
+
+/*
+* Removes the search bar at the top of the list so that there is just a surface
+*/
+SearchableItemsListView.prototype.removeSearchBar = function() {
+	this.topBackgroundSurface.setContent('Items in tutorial');
 }
 
 SearchableItemsListView.DEFAULT_OPTIONS = {
