@@ -6,6 +6,7 @@ var StateModifier = require('famous/modifiers/StateModifier');
 var Scrollview    = require('famous/views/Scrollview');
 var HeaderFooterLayout = require('famous/views/HeaderFooterLayout');
 var FlexibleLayout = require('famous/views/FlexibleLayout');
+var ContainerSurface = require('famous/surfaces/ContainerSurface');
 /*
 * The step 0 view. Let's the user add all the items that they anticipate using in this tutorial to
 * the tutorial, that way they can easily add items to their steps as necessary and easily create
@@ -59,6 +60,9 @@ function _createBodyViews() {
 	this.bodyFlexibleLayoutViews.push(leftHandGap);
 
 	this.allItemsScrollview = new SearchableItemsListView(false);
+
+	var randomView = new View();
+
 	this.bodyFlexibleLayoutViews.push(this.allItemsScrollview);
 
 	this.allItemsScrollview.setPlaceholder('search for an item in the database');
@@ -90,6 +94,13 @@ function _createBodyViews() {
 	this.formPopUpModifier.setVisible(false);
 
 	this.add(this.formPopUpModifier).add(this.formPopUp);
+
+	this.allItemsScrollviewModifier = new StateModifier({
+		size: [500, undefined],
+		transform: Transform.translate(0, 10, 1)
+	});
+
+	//this.add(this.allItemsScrollviewModifier).add(this.allItemsScrollview);
 }
 
 /*
@@ -148,13 +159,33 @@ AddItemsInTutorialView.prototype.addItemToUsersList = function(itemName) {
 			content: itemName,
 			size: [undefined, 40],
 			properties: {
-				textAlign: 'center',
+				textAlign: 'left',
 				backgroundColor: 'cyan',
-				color: 'white'
+				color: 'white',
+				paddingLeft: '5px'
 			}
 		});
 
-		this.usersListedItems.push(itemSurface);
+		var removeItemFromListSurface = new Surface({
+			size: [10, 10],
+			properties: {
+				backgroundColor: 'red'
+			}
+		});
+
+		this.removeItemFromListModifier = new StateModifier({
+			align: [1, 0.5],
+			origin: [1, 0.5],
+			transform: Transform.translate(-5, 0, 1)
+		});
+
+		var itemView = new ContainerSurface({
+			size: [undefined, 40]
+		});
+		itemView.add(itemSurface);
+		itemView.add(this.removeItemFromListModifier).add(removeItemFromListSurface);
+
+		this.usersListedItems.push(itemView);
 		itemSurface.pipe(this.usersItemsScrollview);
 	}
 }

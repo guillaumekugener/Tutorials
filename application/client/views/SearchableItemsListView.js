@@ -223,10 +223,9 @@ SearchableItemsListView.prototype.lookThroughTutorial = function() {
 * given (for example, font-size in the search bar, the size of the header, etc)
 */
 SearchableItemsListView.prototype.changeProperties = function(properties) {
-	console.log(properties);
 	if (properties.headerSize) {
 		this.topBackgroundSurface.setSize([undefined, properties.headerSize]);
-		this.filteredItemsScrollviewModifier.setTransform((0, properties.headerSize, -1));
+		this.filteredItemsScrollviewModifier.setTransform(Transform.translate(0, properties.headerSize, -1));
 		if (this.rightSideIconModifier) {
 			this.rightSideIconModifier.setSize([undefined, properties.headerSize]);
 		}
